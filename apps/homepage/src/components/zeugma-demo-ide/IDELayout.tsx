@@ -120,7 +120,7 @@ export function StatusBar({
     <div className="h-5 bg-[#007acc] text-white flex items-center justify-between px-3 text-[10px] select-none font-mono shrink-0 z-30">
       <div className="flex items-center gap-3">
         <a
-          href="https://github.com/react-zeugma/react-zeugma"
+          href="https://github.com/yusufarsln98/react-zeugma"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"

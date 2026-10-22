@@ -270,7 +270,7 @@ export function Changelog({ contentNodes }: ChangelogProps) {
                 </button>
               )}
               <a
-                href="https://github.com/react-zeugma/react-zeugma/releases"
+                href="https://github.com/yusufarsln98/react-zeugma/releases"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border-primary bg-bg-sidebar/80 hover:bg-bg-sidebar hover:text-text-primary text-xs text-text-secondary transition-colors"

@@ -95,7 +95,7 @@ export function TableOfContents({
       {/* GitHub & Community Links */}
       <div className="pt-4 border-t border-border-primary/60 space-y-2 text-[11px] text-text-muted">
         <a
-          href="https://github.com/react-zeugma/react-zeugma"
+          href="https://github.com/yusufarsln98/react-zeugma"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-2 hover:text-accent transition-colors"
@@ -106,7 +106,7 @@ export function TableOfContents({
         </a>
 
         <a
-          href="https://github.com/react-zeugma/react-zeugma/issues/new"
+          href="https://github.com/yusufarsln98/react-zeugma/issues/new"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-2 hover:text-accent transition-colors"

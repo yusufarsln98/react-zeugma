@@ -162,7 +162,7 @@ export function Navbar() {
               <BrandIcon name="npm" size={18} />
             </a>
             <a
-              href="https://github.com/react-zeugma/react-zeugma"
+              href="https://github.com/yusufarsln98/react-zeugma"
               target="_blank"
               rel="noreferrer"
               className="p-1.5 rounded-lg border border-border-primary bg-bg-pane text-text-secondary hover:text-text-primary hover:border-border-secondary transition-colors"
@@ -220,7 +220,7 @@ export function Navbar() {
               <BrandIcon name="npm" size={18} /> NPM
             </a>
             <a
-              href="https://github.com/react-zeugma/react-zeugma"
+              href="https://github.com/yusufarsln98/react-zeugma"
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-bg-sidebar border border-border-primary text-text-primary hover:border-border-secondary"

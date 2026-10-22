@@ -121,6 +121,6 @@ Versioning and releasing to NPM are fully automated via GitHub Actions using Cha
 
 ## Questions?
 
-Open an [issue](https://github.com/react-zeugma/react-zeugma/issues) or start a [discussion](https://github.com/react-zeugma/react-zeugma/discussions).
+Open an [issue](https://github.com/yusufarsln98/react-zeugma/issues) or start a [discussion](https://github.com/yusufarsln98/react-zeugma/discussions).
 
 Thank you for helping make `react-zeugma` better.
