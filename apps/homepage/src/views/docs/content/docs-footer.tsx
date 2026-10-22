@@ -101,7 +101,7 @@ export function DocsFooter() {
             </li>
             <li>
               <a
-                href="https://github.com/react-zeugma/react-zeugma/blob/master/LICENSE"
+                href="https://github.com/yusufarsln98/react-zeugma/blob/master/LICENSE"
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-text-primary transition-colors"
@@ -117,7 +117,7 @@ export function DocsFooter() {
           <ul className="space-y-2 text-text-muted">
             <li>
               <a
-                href="https://github.com/react-zeugma/react-zeugma"
+                href="https://github.com/yusufarsln98/react-zeugma"
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-text-primary transition-colors flex items-center gap-1.5"
@@ -128,7 +128,7 @@ export function DocsFooter() {
             </li>
             <li>
               <a
-                href="https://github.com/react-zeugma/react-zeugma/issues"
+                href="https://github.com/yusufarsln98/react-zeugma/issues"
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-text-primary transition-colors flex items-center gap-1.5"
@@ -139,7 +139,7 @@ export function DocsFooter() {
             </li>
             <li>
               <a
-                href="https://github.com/react-zeugma/react-zeugma/blob/master/CONTRIBUTING.md"
+                href="https://github.com/yusufarsln98/react-zeugma/blob/master/CONTRIBUTING.md"
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-text-primary transition-colors flex items-center gap-1.5"

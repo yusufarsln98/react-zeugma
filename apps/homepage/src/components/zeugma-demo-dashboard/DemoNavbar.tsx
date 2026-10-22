@@ -60,7 +60,7 @@ export function DemoNavbar() {
         <div className="w-px h-4 bg-[var(--demo-line-soft)] mx-1" />
 
         <a
-          href="https://github.com/react-zeugma/react-zeugma"
+          href="https://github.com/yusufarsln98/react-zeugma"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-1.5 bg-[var(--demo-text-bright)] hover:bg-[var(--demo-text-bright)]/90 text-[var(--demo-canvas)] px-2.5 py-1 rounded-md text-[11px] font-bold transition-colors"

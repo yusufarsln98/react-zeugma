@@ -35,10 +35,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/react-zeugma/react-zeugma.git"
+    "url": "git+https://github.com/yusufarsln98/react-zeugma.git"
   },
   "bugs": {
-    "url": "https://github.com/react-zeugma/react-zeugma/issues"
+    "url": "https://github.com/yusufarsln98/react-zeugma/issues"
   },
   "homepage": "https://react-zeugma.com",
   "publishConfig": {

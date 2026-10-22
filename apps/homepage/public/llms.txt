@@ -7,7 +7,7 @@ react-zeugma combines the recursive binary splitting model of react-mosaic with 
 ## Navigation & Quick Links
 - [Website & Documentation](https://react-zeugma.vercel.app/docs): Comprehensive documentation and interactive guides.
 - [Interactive Demo](https://react-zeugma.vercel.app/demo): Live interactive workspace with multi-tab panels and window popouts.
-- [GitHub Repository](https://github.com/react-zeugma/react-zeugma): Source code, issues, and contributing guidelines.
+- [GitHub Repository](https://github.com/yusufarsln98/react-zeugma): Source code, issues, and contributing guidelines.
 - [npm Package](https://www.npmjs.com/package/react-zeugma): Official package distribution (v7.1).
 - [SKILL.md Specification](https://react-zeugma.vercel.app/docs#skill-md): Official AI coding skill file for Antigravity, Cursor, and Claude Code.
 

@@ -1,6 +1,6 @@
 # react-zeugma homepage
 
-The marketing and documentation homepage for [react-zeugma](https://github.com/react-zeugma/react-zeugma).
+The marketing and documentation homepage for [react-zeugma](https://github.com/yusufarsln98/react-zeugma).
 
 ## Development
 

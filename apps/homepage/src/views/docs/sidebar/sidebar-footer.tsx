@@ -37,7 +37,7 @@ export function SidebarFooter() {
         </a>
 
         <a
-          href="https://github.com/react-zeugma/react-zeugma"
+          href="https://github.com/yusufarsln98/react-zeugma"
           target="_blank"
           rel="noreferrer"
           className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-sidebar transition-colors"
