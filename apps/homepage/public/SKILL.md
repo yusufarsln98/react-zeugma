@@ -255,5 +255,5 @@ Import mount and render counter utilities from `react-zeugma/devtools` or `react
 
 React Zeugma provides an official, curated `/llms.txt` document conforming to the [llmstxt.org](https://llmstxt.org) standard:
 
-- **URL**: `https://react-zeugma.vercel.app/llms.txt`
+- **URL**: `https://www.react-zeugma.com/llms.txt`
 - **Use Case**: Ingesting high-density architecture, layout schemas, and API reference into LLMs (NotebookLM, Claude, ChatGPT, or custom RAG vectors) without parsing HTML.

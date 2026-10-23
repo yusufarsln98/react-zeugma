@@ -579,7 +579,7 @@ function MyDashboardWidget({ id }: { id: string }) {
 React Zeugma provides official context specifications optimized for AI coding assistants (Google Antigravity, Cursor, Claude Code, GitHub Copilot) and LLMs:
 
 - **SKILL.md**: Copy the specification below into `.agents/skills/react-zeugma/SKILL.md` or `.cursor/rules/` to guide AI agents to generate hallucination-free recursive layout trees.
-- **llms.txt**: A curated plaintext summary conforming to [llmstxt.org](https://llmstxt.org) is available at [https://react-zeugma.vercel.app/llms.txt](https://react-zeugma.vercel.app/llms.txt).
+- **llms.txt**: A curated plaintext summary conforming to [llmstxt.org](https://llmstxt.org) is available at [https://www.react-zeugma.com/llms.txt](https://www.react-zeugma.com/llms.txt).
 
 ````markdown
 ---
@@ -841,6 +841,6 @@ Import mount and render counter utilities from `react-zeugma/devtools` or `react
 
 React Zeugma provides an official, curated `/llms.txt` document conforming to the [llmstxt.org](https://llmstxt.org) standard:
 
-- **URL**: `https://react-zeugma.vercel.app/llms.txt`
+- **URL**: `https://www.react-zeugma.com/llms.txt`
 - **Use Case**: Ingesting high-density architecture, layout schemas, and API reference into LLMs (NotebookLM, Claude, ChatGPT, or custom RAG vectors) without parsing HTML.
 ````

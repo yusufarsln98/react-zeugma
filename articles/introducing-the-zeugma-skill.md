@@ -15,4 +15,4 @@ You can view and download the complete `SKILL.md` file and explore the `/llms.tx
 ### Setup Instructions:
 
 1. Create a `SKILL.md` file in your `.agents/skills/react-zeugma/` or `.cursor/rules/` directory.
-2. Download or copy the contents from the [AI Integration](/docs#skill-md) section of the documentation (or fetch `https://react-zeugma.vercel.app/llms.txt` for raw LLM ingestion) and paste them into the file.
+2. Download or copy the contents from the [AI Integration](/docs#skill-md) section of the documentation (or fetch `https://www.react-zeugma.com/llms.txt` for raw LLM ingestion) and paste them into the file.

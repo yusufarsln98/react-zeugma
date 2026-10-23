@@ -5,11 +5,11 @@
 react-zeugma combines the recursive binary splitting model of react-mosaic with the declarative, state-driven API ergonomics of react-grid-layout. It is 100% style-agnostic (headless), supports multi-tab docking, isolated fine-grained reactivity, native multi-window popouts, and deterministic serialization.
 
 ## Navigation & Quick Links
-- [Website](https://react-zeugma.vercel.app): Official website and interactive workspace overview.
-- [Interactive Demo](https://react-zeugma.vercel.app/demo): Live interactive workspace with multi-tab panels and window popouts.
+- [Website](https://www.react-zeugma.com): Official website and interactive workspace overview.
+- [Interactive Demo](https://www.react-zeugma.com/demo): Live interactive workspace with multi-tab panels and window popouts.
 - [GitHub Repository](https://github.com/yusufarsln98/react-zeugma): Source code, issues, and contributing guidelines.
 - [npm Package](https://www.npmjs.com/package/react-zeugma): Official package distribution (v7.1).
-- [SKILL.md Specification](https://react-zeugma.vercel.app/SKILL.md): Official AI coding skill file for Antigravity, Cursor, and Claude Code.
+- [SKILL.md Specification](https://www.react-zeugma.com/SKILL.md): Official AI coding skill file for Antigravity, Cursor, and Claude Code.
 
 ## Core Architectural Invariants & AI Constraints
 1. **Immutable State Rule**: Never mutate layout `TreeNode` objects directly in-place. Treat them as immutable. Always use pure utility functions exported by `react-zeugma/utils` to perform mutations and return fresh tree references.
