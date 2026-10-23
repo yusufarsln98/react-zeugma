@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { Zeugma, Pane, useZeugma, TabDetails, usePaneContext, PaneTree } from 'react-zeugma'
+import { Zeugma, Pane, useZeugma, TabDetails, usePaneContext, PaneTree } from 'react-zeugma/react'
 import { DashboardToolbar, DashboardContainer } from './zeugma-demo-dashboard/DashboardLayout'
 import { WidgetWrapper } from './zeugma-demo-dashboard/WidgetWrapper'
 import { LiveDataProvider } from './zeugma-demo-dashboard/LiveDataProvider'

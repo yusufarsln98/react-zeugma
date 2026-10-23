@@ -1,7 +1,7 @@
 {
   "name": "react-zeugma",
-  "version": "7.2.0",
-  "description": "Recursive drag-and-drop dashboard layout engine for React — combining the tree-based splitting of react-mosaic with the declarative API of react-grid-layout.",
+  "version": "8.0.0",
+  "description": "Recursive drag-and-drop dashboard layout engine — combining the tree-based splitting of react-mosaic with the declarative API of react-grid-layout. Framework-agnostic core with React bindings.",
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.cjs",
@@ -10,22 +10,53 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
       "default": "./dist/index.js"
     },
-    "./utils": {
-      "types": "./dist/utils.d.ts",
-      "import": "./dist/utils.js",
-      "require": "./dist/utils.cjs",
-      "default": "./dist/utils.js"
+    "./core": {
+      "types": "./dist/index.d.ts",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": {
+        "types": "./dist/react.d.ts",
+        "default": "./dist/react.js"
+      },
+      "require": {
+        "types": "./dist/react.d.cts",
+        "default": "./dist/react.cjs"
+      },
+      "default": "./dist/react.js"
     },
     "./devtools": {
       "types": "./dist/devtools.d.ts",
-      "import": "./dist/devtools.js",
-      "require": "./dist/devtools.cjs",
+      "import": {
+        "types": "./dist/devtools.d.ts",
+        "default": "./dist/devtools.js"
+      },
+      "require": {
+        "types": "./dist/devtools.d.cts",
+        "default": "./dist/devtools.cjs"
+      },
       "default": "./dist/devtools.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -59,15 +90,16 @@
     "tree",
     "panel",
     "resizable",
-    "widget"
+    "widget",
+    "framework-agnostic"
   ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint src --ext ts,tsx",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"docs/**/*.{ts,tsx,mdx}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"docs/**/*.{ts,tsx,mdx}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "test": "vitest run",
     "test:watch": "vitest",
     "version": "changeset version",
@@ -76,6 +108,14 @@
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1"

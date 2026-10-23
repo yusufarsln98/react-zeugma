@@ -1,5 +1,15 @@
 # react-zeugma
 
+## 8.0.0
+
+### Major Changes
+
+- **Framework-Agnostic Core & Subpath Architecture (`core` + `react`)**:
+  - Reorganized the library into a framework-agnostic core (`src/core/`) and dedicated React bindings (`src/react/`).
+  - **Root & Core Entrypoints (`react-zeugma` / `react-zeugma/core`)**: Now export pure, zero-React layout tree mutators, queries, layout bounding-box calculations (`computeLayout`), and core types without a `"use client"` directive. Removed the separate `react-zeugma/utils` subpath in favor of the root/core entry.
+  - **React Subpath (`react-zeugma/react`)**: Moved all React components (`<Zeugma>`, `<PaneTree>`, `<Pane>`), hooks (`useZeugma`, `useZeugmaContext`, `usePaneContext`, `useResizer`), contexts, portals, and `@dnd-kit/core` integration to `react-zeugma/react`.
+  - Marked `react` and `react-dom` peer dependencies as optional in `peerDependenciesMeta` so non-React consumers can install and use the core engine standalone.
+
 ## 7.2.0
 
 ### Minor Changes

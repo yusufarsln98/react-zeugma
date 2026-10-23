@@ -1,4 +1,4 @@
-import { useZeugmaContext } from 'react-zeugma'
+import { useZeugmaContext } from 'react-zeugma/react'
 import { JSONFormatter } from '../syntax-code'
 
 export function InspectorWidget() {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { Zeugma, Pane, useZeugma, TabDetails } from 'react-zeugma'
+import { Zeugma, Pane, useZeugma, TabDetails } from 'react-zeugma/react'
 
 import { defaultOuterLayout, LAYOUT_PRESETS } from './mock-files'
 

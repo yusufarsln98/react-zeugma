@@ -1,6 +1,6 @@
 import { FileCode2, Folder, Terminal, Code, X } from 'lucide-react'
 import { FILES } from '../mock-files'
-import { RenderTabProps } from 'react-zeugma'
+import { RenderTabProps } from 'react-zeugma/react'
 
 export function getTabMetadata(tabId: string) {
   const basename = tabId.includes('/') ? tabId.split('/').pop()! : tabId

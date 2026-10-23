@@ -14,7 +14,7 @@ import {
   X,
 } from 'lucide-react'
 import { LayoutPresetDropdown } from './LayoutPresetDropdown'
-import { usePaneContext } from 'react-zeugma'
+import { usePaneContext } from 'react-zeugma/react'
 
 // ── IDE Container & Main Panels ──────────────────────────────────────────────
 

@@ -6,7 +6,7 @@ import { TreeNode } from 'react-zeugma'
 // ─── Code Strings ─────────────────────────────────────────────────────────────
 
 const APP_TSX_CODE = `import React from 'react'
-import { useZeugma, Zeugma, Pane, TreeNode } from 'react-zeugma'
+import { useZeugma, Zeugma, Pane, TreeNode } from 'react-zeugma/react'
 
 // ─── Widget Registry ──────────────────────────────────────────────────────────
 

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { LayoutGrid } from 'lucide-react'
-import { useZeugmaContext, TreeNode } from 'react-zeugma'
+import { useZeugmaContext, TreeNode } from 'react-zeugma/react'
 import { AVAILABLE_WIDGETS, WIDGET_META } from './constants'
 
 // Helper to get all tab IDs currently in the layout
