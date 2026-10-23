@@ -1,5 +1,0 @@
-export { DocsSidebar } from './sidebar'
-export type { DocsSidebarProps } from './sidebar'
-export { SidebarItem } from './sidebar-item'
-export { SidebarFilter } from './sidebar-filter'
-export { SidebarFooter } from './sidebar-footer'

@@ -1,6 +1,0 @@
-export { DocsContent } from './content'
-export type { DocsContentProps } from './content'
-export { PageHeader } from './page-header'
-export { PagePagination } from './page-pagination'
-export { PageFeedback } from './page-feedback'
-export { DocsFooter } from './docs-footer'

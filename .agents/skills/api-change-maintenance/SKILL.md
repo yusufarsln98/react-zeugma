@@ -86,48 +86,33 @@ This is the user-facing canonical documentation. It contains:
 
 ---
 
-## 5. Homepage Docs — Data Files
+## 5. AI Context Standards (SKILL.md & llms.txt)
 
-The `/docs` page is powered by structured TSX files in `apps/homepage/src/config/docs-data/`. Each file contains code strings, prop tables, and explanatory text:
+Documentation is maintained solely via singleton AI standards:
 
-| File                     | What it contains                                                                | What to audit                                                                                                                                            |
-| :----------------------- | :------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `api-reference.tsx`      | Prop tables, controller methods, pane context properties, tree utility table    | Table row arrays: `ZEUGMA_PROPS`, `RENDER_TAB_PROPS`, `USE_ZEUGMA_OPTIONS`, `ZEUGMA_CONTROLLER_METHODS`, `USE_PANE_CONTEXT_PROPERTIES`, `TREE_UTILITIES` |
-| `skill-md.tsx`           | `SKILL_MD_CONTENT` — the complete AI SKILL.md text in markdown template literal | Type schemas (`PaneNode.tabIds`), props, controller return signatures, utility list, code examples                                                       |
-| `tree-layout.tsx`        | `TREE_LAYOUT_CODE` — `TreeNode`, `SplitNode`, `PaneNode` type definitions       | Tree interfaces and spatial topology documentation                                                                                                       |
-| `quickstart.tsx`         | `QUICKSTART_CODE` — full quick-start code snippet                               | Imports, component props, and basic usage                                                                                                                |
-| `state-controller.tsx`   | `useZeugma` controlled/uncontrolled examples                                    | Controller options, returned actions, and queries                                                                                                        |
-| `pane-customization.tsx` | Subcomponents: `<Pane.DragHandle>`, `<Pane.Content>`, `<Pane.Tabs>`             | Subcomponent prop signatures and composition rules                                                                                                       |
-| `advanced-features.tsx`  | Context APIs, popouts, sync examples, debounced updates                         | Hook usages, context properties, and popout styling                                                                                                      |
-| `introduction.tsx`       | Feature highlights, "Why Zeugma" checklist                                      | High-level feature list and capabilities                                                                                                                 |
+- **SKILL.md:** `.agents/skills/react-zeugma/SKILL.md` (mirrored to `apps/homepage/public/SKILL.md`)
+- **llms.txt:** `apps/homepage/public/llms.txt`
 
-> [!IMPORTANT]
-> **String constants are fragile**: Code blocks in docs data files are stored as template literal strings. Escape backticks (`\``) and interpolation (`${}`) properly when editing.
+When an API surface changes, audit and update the type definitions, prop signatures, and code examples in:
+
+1. `.agents/skills/react-zeugma/SKILL.md` (and copy to `apps/homepage/public/SKILL.md`)
+2. `apps/homepage/public/llms.txt`
 
 ---
 
-## 6. Homepage Docs — Interactive Components
-
-| File                                               | What it contains                                                                    | Action                                            |
-| :------------------------------------------------- | :---------------------------------------------------------------------------------- | :------------------------------------------------ |
-| `apps/homepage/src/components/docs-playground.tsx` | Interactive playground embedded in docs Introduction                                | Update `<Zeugma>` / `<Pane>` / `<PaneTree>` usage |
-| `apps/homepage/src/components/docs-mini-demos.tsx` | Mini interactive demos (`BasicSplitDemo`, `TabControllerDemo`, `CustomStylingDemo`) | Update props or controller calls if affected      |
-
----
-
-## 7. Demo Applications & Landing Pages
+## 6. Demo Applications & Landing Pages
 
 | File                                                                                | Key API Usage                                                                                        |
 | :---------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------- |
 | `apps/homepage/src/components/zeugma-demo-dashboard.tsx` & `zeugma-demo-dashboard/` | Full dashboard demo with `DashboardDrawer`, widget panels, controls drawer exposing `<Zeugma>` props |
 | `apps/homepage/src/components/zeugma-demo-ide.tsx` & `zeugma-demo-ide/`             | IDE demo with multi-tab panes, tree layout, and popout widgets                                       |
-| `apps/homepage/src/views/home.tsx`                                                  | Landing page feature cards and live demo embed                                                       |
+| `apps/homepage/src/views/home/`                                                     | Landing page feature cards and live demo embed                                                       |
 
 **Action:** If a `<Zeugma>` prop or controller method is modified, update the demo components and controls in `DashboardDrawer`.
 
 ---
 
-## 8. Monorepo Verification Pipeline
+## 7. Monorepo Verification Pipeline
 
 Always run the full verification pipeline before committing or releasing any API change:
 
@@ -150,7 +135,7 @@ npm run build:homepage
 
 ---
 
-## 9. Quick Audit Checklist
+## 8. Quick Audit Checklist
 
 When changing any API, verify each item:
 
@@ -159,8 +144,7 @@ When changing any API, verify each item:
 - [ ] **Contract Test**: `packages/react-zeugma/src/__tests__/public-exports.test.ts` updated and passing
 - [ ] **Unit Tests**: Added corresponding unit/invariant/characterization tests
 - [ ] **Canonical README**: `packages/react-zeugma/README.md` prop tables, types, and examples updated
-- [ ] **Docs Reference**: `apps/homepage/src/config/docs-data/api-reference.tsx` row arrays updated
-- [ ] **AI SKILL.md**: `apps/homepage/src/config/docs-data/skill-md.tsx` (`SKILL_MD_CONTENT`) updated
-- [ ] **Docs Code Snippets**: `quickstart.tsx`, `tree-layout.tsx`, `state-controller.tsx`, etc. updated
-- [ ] **Interactive Demos**: `zeugma-demo-dashboard.tsx`, `zeugma-demo-ide.tsx`, `docs-playground.tsx` updated
+- [ ] **AI SKILL.md**: `.agents/skills/react-zeugma/SKILL.md` updated and mirrored to `apps/homepage/public/SKILL.md`
+- [ ] **AI llms.txt**: `apps/homepage/public/llms.txt` updated
+- [ ] **Interactive Demos**: `zeugma-demo-dashboard.tsx` and `zeugma-demo-ide.tsx` updated
 - [ ] **Full Build**: `npm test`, `npm run typecheck`, `npm run lint:lib`, `npm run build:lib`, and `npm run build:homepage` all pass cleanly

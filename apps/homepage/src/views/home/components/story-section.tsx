@@ -15,7 +15,7 @@ export function StorySection() {
         </p>
         <div className="mt-8 flex justify-center gap-3 text-xs font-semibold">
           <Link
-            href="/docs"
+            href="/demo"
             className="px-5 py-2.5 rounded-lg bg-bg-pane border border-border-primary hover:border-border-secondary text-text-primary transition-colors"
           >
             Start Building

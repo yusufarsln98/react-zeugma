@@ -75,12 +75,14 @@ export function HeroSection({ appVersion }: HeroSectionProps) {
             <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
 
-          <Link
-            href="/docs"
+          <a
+            href="/SKILL.md"
+            target="_blank"
+            rel="noreferrer"
             className="w-full sm:w-auto px-6 py-3 rounded-xl bg-bg-pane border border-border-primary hover:border-border-secondary text-text-primary font-semibold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
           >
-            <span>Read Documentation</span>
-          </Link>
+            <span>SKILL.md Spec</span>
+          </a>
 
           {/* Terminal Copy Snippet */}
           <div className="w-full sm:w-auto flex items-center rounded-xl bg-bg-pane border border-border-primary overflow-hidden shadow-2xs font-mono text-xs">

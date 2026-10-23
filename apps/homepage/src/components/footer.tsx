@@ -1,4 +1,4 @@
-import { HelpCircle, FileText, Heart, Terminal, BookOpen, Layers } from 'lucide-react'
+import { HelpCircle, FileText, Heart, Terminal, Layers, Bot, FileCode } from 'lucide-react'
 import Link from 'next/link'
 import { BrandIcon } from './brand-icon'
 
@@ -9,9 +9,9 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border-primary bg-bg-sidebar/60 py-16 px-6 sm:px-8 mt-auto transition-colors select-none">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-10">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-10">
         {/* Brand Column */}
-        <div className="md:col-span-2 space-y-4">
+        <div className="sm:col-span-2 md:col-span-2 space-y-4">
           <Link href="/" className="flex items-center gap-2.5">
             <img src={LOGO_URL} alt="react-zeugma logo" className="w-6 h-6 object-contain" />
             <span className="font-bold text-base tracking-tight text-text-primary">
@@ -53,19 +53,38 @@ export function Footer() {
             </li>
             <li>
               <Link
-                href="/docs"
-                className="text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2"
-              >
-                <BookOpen className="w-3.5 h-3.5 text-accent" /> Documentation
-              </Link>
-            </li>
-            <li>
-              <Link
                 href="/changelog"
                 className="text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2"
               >
                 <FileText className="w-3.5 h-3.5 text-text-muted" /> Release Notes
               </Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* AI & Standards */}
+        <div className="space-y-3">
+          <h4 className="eyebrow">AI &amp; Standards</h4>
+          <ul className="space-y-2 text-xs font-medium">
+            <li>
+              <a
+                href="/SKILL.md"
+                target="_blank"
+                rel="noreferrer"
+                className="text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2"
+              >
+                <Bot className="w-3.5 h-3.5 text-accent" /> SKILL.md Spec
+              </a>
+            </li>
+            <li>
+              <a
+                href="/llms.txt"
+                target="_blank"
+                rel="noreferrer"
+                className="text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2"
+              >
+                <FileCode className="w-3.5 h-3.5 text-accent" /> llms.txt Index
+              </a>
             </li>
           </ul>
         </div>

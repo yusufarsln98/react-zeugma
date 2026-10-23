@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
 export function CodePreviewSection() {
@@ -41,13 +40,15 @@ export function CodePreviewSection() {
             </li>
           </ul>
 
-          <Link
-            href="/docs"
+          <a
+            href="/SKILL.md"
+            target="_blank"
+            rel="noreferrer"
             className="inline-flex items-center gap-2 text-xs font-semibold text-accent hover:text-accent-strong transition-colors"
           >
-            <span>Explore Quick Start Guide</span>
+            <span>Explore SKILL.md Specification</span>
             <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          </a>
         </div>
 
         {/* Code Card */}

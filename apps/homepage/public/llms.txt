@@ -5,21 +5,11 @@
 react-zeugma combines the recursive binary splitting model of react-mosaic with the declarative, state-driven API ergonomics of react-grid-layout. It is 100% style-agnostic (headless), supports multi-tab docking, isolated fine-grained reactivity, native multi-window popouts, and deterministic serialization.
 
 ## Navigation & Quick Links
-- [Website & Documentation](https://react-zeugma.vercel.app/docs): Comprehensive documentation and interactive guides.
+- [Website](https://react-zeugma.vercel.app): Official website and interactive workspace overview.
 - [Interactive Demo](https://react-zeugma.vercel.app/demo): Live interactive workspace with multi-tab panels and window popouts.
 - [GitHub Repository](https://github.com/yusufarsln98/react-zeugma): Source code, issues, and contributing guidelines.
 - [npm Package](https://www.npmjs.com/package/react-zeugma): Official package distribution (v7.1).
-- [SKILL.md Specification](https://react-zeugma.vercel.app/docs#skill-md): Official AI coding skill file for Antigravity, Cursor, and Claude Code.
-
-## Documentation Index
-- [Introduction & Architecture](https://react-zeugma.vercel.app/docs#introduction): Binary tree spatial topology vs 12-column coordinate grids.
-- [Quick Start](https://react-zeugma.vercel.app/docs#quickstart): Installation (pnpm/npm/yarn/bun), standalone vs provider mode, custom pane composition.
-- [Tree Layout Engine](https://react-zeugma.vercel.app/docs#tree-layout): Serialized binary tree interfaces (TreeNode, SplitNode, PaneNode, TabDetails).
-- [State & Controller](https://react-zeugma.vercel.app/docs#state-controller): useZeugma hook, layout persistence, global and per-pane locking, fullscreen zoom.
-- [Pane Customization](https://react-zeugma.vercel.app/docs#pane-customization): Compound components (Pane.DragHandle, Pane.Content, Pane.Tabs, Pane.Controls).
-- [Advanced Features](https://react-zeugma.vercel.app/docs#advanced-features): Context hooks (useZeugmaContext, usePaneContext), multi-window popouts, devtools render counters.
-- [API Reference](https://react-zeugma.vercel.app/docs#api-reference): Complete prop tables, controller methods, pane context properties, and tree utilities.
-- [AI Integration](https://react-zeugma.vercel.app/docs#skill-md): Pre-configured AI coding assistant rules and configuration.
+- [SKILL.md Specification](https://react-zeugma.vercel.app/SKILL.md): Official AI coding skill file for Antigravity, Cursor, and Claude Code.
 
 ## Core Architectural Invariants & AI Constraints
 1. **Immutable State Rule**: Never mutate layout `TreeNode` objects directly in-place. Treat them as immutable. Always use pure utility functions exported by `react-zeugma/utils` to perform mutations and return fresh tree references.

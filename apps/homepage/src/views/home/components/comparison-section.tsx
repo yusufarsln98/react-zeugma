@@ -101,12 +101,14 @@ export function ComparisonSection() {
                 Comparing architecture, developer experience, and runtime constraints.
               </p>
             </div>
-            <Link
-              href="/docs#introduction"
+            <a
+              href="/SKILL.md"
+              target="_blank"
+              rel="noreferrer"
               className="text-xs font-mono text-accent hover:underline flex items-center gap-1 font-semibold self-start sm:self-auto"
             >
               Architectural Deep-Dive <ArrowRight className="w-3 h-3" />
-            </Link>
+            </a>
           </div>
 
           <div className="overflow-x-auto">
@@ -149,12 +151,14 @@ export function ComparisonSection() {
               Ready to replace your existing layout engine with a modern headless solution?
             </span>
             <div className="flex items-center gap-2">
-              <Link
-                href="/docs#quickstart"
+              <a
+                href="/SKILL.md"
+                target="_blank"
+                rel="noreferrer"
                 className="px-3.5 py-1.5 rounded-lg bg-accent text-accent-fg font-semibold text-xs hover:bg-accent-strong transition-colors"
               >
-                Migration Guide
-              </Link>
+                Specification
+              </a>
               <Link
                 href="/demo"
                 className="px-3.5 py-1.5 rounded-lg bg-bg-pane border border-border-primary text-text-primary font-semibold text-xs hover:border-border-secondary transition-colors"
