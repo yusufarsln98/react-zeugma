@@ -96,29 +96,30 @@ import { Zeugma } from 'react-zeugma'
 
 ##### Props
 
-| Property                 | Description                                                                                                                                                                             | Type                                                                                                                                                                                             | Default |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
-| `controller`             | The layout state controller returned by `useZeugma(options)`.                                                                                                                           | `ZeugmaController`                                                                                                                                                                               | -       |
-| `children`               | Children components rendered inside the context provider.                                                                                                                               | `ReactNode`                                                                                                                                                                                      | -       |
-| `renderPane`             | Callback function to map active pane IDs to custom pane structures. Required in standalone mode (without children) and must not be passed in provider mode.                             | `(paneId: string) => ReactNode`                                                                                                                                                                  | -       |
-| `renderDragOverlay`      | Custom overlay renderer function for the drag-under-cursor preview.                                                                                                                     | `(active: DragOverlayActiveItem) => ReactNode`                                                                                                                                                   | -       |
-| `classNames`             | CSS class name mapping overrides for custom dashboard and overlay styling.                                                                                                              | `ZeugmaClassNames`                                                                                                                                                                               | -       |
-| `resizerSize`            | Thickness of the split resizer bars in pixels.                                                                                                                                          | `number`                                                                                                                                                                                         | `4`     |
-| `dragActivationDistance` | Minimum pointer drag distance (in pixels) required to activate dragging.                                                                                                                | `number`                                                                                                                                                                                         | `8`     |
-| `snapThreshold`          | Threshold in pixels to snap layout resizers to adjacent edges.                                                                                                                          | `number`                                                                                                                                                                                         | `8`     |
-| `minSplitPercentage`     | Minimum split limit percentage allowed for resized panes.                                                                                                                               | `number`                                                                                                                                                                                         | `5`     |
-| `maxSplitPercentage`     | Maximum split limit percentage allowed for resized panes.                                                                                                                               | `number`                                                                                                                                                                                         | `95`    |
-| `enableDragToDismiss`    | Enables drag-out-to-dismiss gesture for widgets.                                                                                                                                        | `boolean`                                                                                                                                                                                        | `false` |
-| `dismissThreshold`       | Distance in pixels outside container bounds required to trigger dismissal.                                                                                                              | `number`                                                                                                                                                                                         | `60`    |
-| `onRemove`               | Callback triggered when a pane is removed.                                                                                                                                              | `(paneId: string) => void`                                                                                                                                                                       | -       |
-| `onDragStart`            | Callback triggered when a drag gesture begins.                                                                                                                                          | `(activeId: string) => void`                                                                                                                                                                     | -       |
-| `onDragEnd`              | Callback triggered when a drag gesture ends, containing active pane, target pane, and action metadata.                                                                                  | `(activeId: string, overId: string \| null, dropAction: { type: 'split' \| 'move'; direction?: SplitDirection; position?: 'top' \| 'bottom' \| 'left' \| 'right' \| 'center' } \| null) => void` | -       |
-| `onResizeStart`          | Callback triggered when resizing begins.                                                                                                                                                | `(currentNode: SplitNode) => void`                                                                                                                                                               | -       |
-| `onResize`               | Callback triggered during pane resizing.                                                                                                                                                | `(currentNode: SplitNode, percentage: number) => void`                                                                                                                                           | -       |
-| `onResizeEnd`            | Callback triggered when pane resizing completes.                                                                                                                                        | `(currentNode: SplitNode, percentage: number) => void`                                                                                                                                           | -       |
-| `onDismissIntentChange`  | Callback triggered when drag-out dismiss intent changes.                                                                                                                                | `(paneId: string \| null) => void`                                                                                                                                                               | -       |
-| `persist`                | Layout persistence configuration in localStorage. If true, uses default options.                                                                                                        | `boolean \| ZeugmaPersistOptions`                                                                                                                                                                | `false` |
-| `renderPopoutWrapper`    | **[Experimental]** Custom wrapper to inject context or style managers (e.g. `styled-components`' `StyleSheetManager` or `antd`'s `StyleProvider`/`ConfigProvider`) into popout windows. | `(props: { tabId: string; document: Document; window: Window; children: React.ReactNode }) => React.ReactNode`                                                                                   | -       |
+| Property                  | Description                                                                                                                                                                             | Type                                                                                                                                                                                             | Default |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `controller`              | The layout state controller returned by `useZeugma(options)`.                                                                                                                           | `ZeugmaController`                                                                                                                                                                               | -       |
+| `children`                | Children components rendered inside the context provider.                                                                                                                               | `ReactNode`                                                                                                                                                                                      | -       |
+| `renderPane`              | Callback function to map active pane IDs to custom pane structures. Required in standalone mode (without children) and must not be passed in provider mode.                             | `(paneId: string) => ReactNode`                                                                                                                                                                  | -       |
+| `renderDragOverlay`       | Custom overlay renderer function for the drag-under-cursor preview.                                                                                                                     | `(active: DragOverlayActiveItem) => ReactNode`                                                                                                                                                   | -       |
+| `classNames`              | CSS class name mapping overrides for custom dashboard and overlay styling.                                                                                                              | `ZeugmaClassNames`                                                                                                                                                                               | -       |
+| `resizerSize`             | Thickness of the split resizer bars in pixels.                                                                                                                                          | `number`                                                                                                                                                                                         | `4`     |
+| `dragActivationDistance`  | Minimum pointer drag distance (in pixels) required to activate dragging.                                                                                                                | `number`                                                                                                                                                                                         | `8`     |
+| `snapThreshold`           | Threshold in pixels to snap layout resizers to adjacent edges.                                                                                                                          | `number`                                                                                                                                                                                         | `8`     |
+| `minSplitPercentage`      | Minimum split limit percentage allowed for resized panes.                                                                                                                               | `number`                                                                                                                                                                                         | `5`     |
+| `maxSplitPercentage`      | Maximum split limit percentage allowed for resized panes.                                                                                                                               | `number`                                                                                                                                                                                         | `95`    |
+| `enableDragToDismiss`     | Enables drag-out-to-dismiss gesture for widgets.                                                                                                                                        | `boolean`                                                                                                                                                                                        | `false` |
+| `dismissThreshold`        | Distance in pixels outside container bounds required to trigger dismissal.                                                                                                              | `number`                                                                                                                                                                                         | `60`    |
+| `onRemove`                | Callback triggered when a pane is removed.                                                                                                                                              | `(paneId: string) => void`                                                                                                                                                                       | -       |
+| `onDragStart`             | Callback triggered when a drag gesture begins.                                                                                                                                          | `(activeId: string) => void`                                                                                                                                                                     | -       |
+| `onDragEnd`               | Callback triggered when a drag gesture ends, containing active pane, target pane, and action metadata.                                                                                  | `(activeId: string, overId: string \| null, dropAction: { type: 'split' \| 'move'; direction?: SplitDirection; position?: 'top' \| 'bottom' \| 'left' \| 'right' \| 'center' } \| null) => void` | -       |
+| `onResizeStart`           | Callback triggered when resizing begins.                                                                                                                                                | `(currentNode: SplitNode) => void`                                                                                                                                                               | -       |
+| `onResize`                | Callback triggered during pane resizing.                                                                                                                                                | `(currentNode: SplitNode, percentage: number) => void`                                                                                                                                           | -       |
+| `onResizeEnd`             | Callback triggered when pane resizing completes.                                                                                                                                        | `(currentNode: SplitNode, percentage: number) => void`                                                                                                                                           | -       |
+| `onDismissIntentChange`   | Callback triggered when drag-out dismiss intent changes.                                                                                                                                | `(paneId: string \| null) => void`                                                                                                                                                               | -       |
+| `persist`                 | Layout persistence configuration in localStorage. If true, uses default options.                                                                                                        | `boolean \| ZeugmaPersistOptions`                                                                                                                                                                | `false` |
+| `renderPopoutWrapper`     | **[Experimental]** Custom wrapper to inject context or style managers (e.g. `styled-components`' `StyleSheetManager` or `antd`'s `StyleProvider`/`ConfigProvider`) into popout windows. | `(props: { tabId: string; document: Document; window: Window; children: React.ReactNode }) => React.ReactNode`                                                                                   | -       |
+| `renderPopoutPlaceholder` | **[Experimental]** Custom renderer for the placeholder shown in a pane when its active tab is popped out into a new window.                                                             | `(props: PopoutPlaceholderProps) => ReactNode`                                                                                                                                                   | -       |
 
 ##### `ZeugmaPersistOptions`
 
@@ -183,7 +184,7 @@ import { Zeugma, PaneTree } from 'react-zeugma'
 Wraps each individual pane/widget within the dashboard, establishing drag-and-drop boundaries.
 
 - **`<Pane.DragHandle>`**: Defines the interactive header or area used to drag the pane.
-- **`<Pane.Content>`**: Renders the active tab's content. Accepts a child render function `(tab) => React.ReactNode` or static ReactNode.
+- **`<Pane.Content>`**: Renders the active tab's content. Accepts a child render function `(tab) => React.ReactNode` or static ReactNode, and an optional `renderPopoutPlaceholder` callback when the tab is popped out into a separate window.
 - **`<Pane.Controls>`**: Renders standard control buttons for closing or maximizing the pane.
 
 ##### Usage
@@ -195,7 +196,15 @@ import { Pane } from 'react-zeugma'
     <span>Pane Title</span>
   </Pane.DragHandle>
   <Pane.Controls />
-  <Pane.Content className="p-4">
+  <Pane.Content
+    className="p-4"
+    renderPopoutPlaceholder={({ tabId, dock }) => (
+      <div>
+        <span>Tab {tabId} open in new window</span>
+        <button onClick={dock}>Dock Back</button>
+      </div>
+    )}
+  >
     {(tab) => <div>Rendered content for tab: {tab.id}</div>}
   </Pane.Content>
 </Pane>
@@ -465,32 +474,33 @@ const parentPane = findPaneContainingTab(currentTree, 'new-file.js')
 
 ##### Class Names Mapping
 
-| Class Key                | Description                                                         |
-| ------------------------ | ------------------------------------------------------------------- |
-| `dashboard`              | Root dashboard grid container.                                      |
-| `dashboardDismissActive` | Dashboard container when active item is dragged outside to dismiss. |
-| `dashboardLocked`        | Dashboard container when layout is globally locked.                 |
-| `pane`                   | Outer container div of each `<Pane>`.                               |
-| `paneLocked`             | Pane container wrapper when locked.                                 |
-| `paneContainer`          | Pane inner content container wrapper.                               |
-| `paneHeader`             | Drag header wrapper inside the pane.                                |
-| `paneControls`           | Controls wrapper container (maximizing, close, lock).               |
-| `paneButton`             | Maximize/Close control buttons.                                     |
-| `dropPreview`            | Preview indicator box for edge layout splits.                       |
-| `rootDropPreview`        | Preview indicator for full layout splits.                           |
-| `dragOverlay`            | Absolute portal wrapper following the dragging cursor.              |
-| `paneDragPreview`        | Outer wrapper container of a pane drag preview node.                |
-| `tabDragPreview`         | Outer wrapper container of a tab drag preview node.                 |
-| `resizer`                | Pointer-drag splitter handle bars.                                  |
-| `dismissPreview`         | Background indicator showing visual drag-to-dismiss zones.          |
-| `lockedPreview`          | Hover visual feedback indicator for locked pane zones.              |
-| `tabDropPreview`         | Tab list insertion indicator line.                                  |
-| `tabSeparator`           | Line separator between static tabs.                                 |
-| `tabContentWrapper`      | Custom tab content element wrapper.                                 |
-| `tabsContainer`          | Layout tabs container header bar.                                   |
-| `tab`                    | Individual tab list items.                                          |
-| `tabCloseButton`         | Close button inside a tab item.                                     |
-| `dragHandle`             | Drag target region.                                                 |
+| Class Key                | Description                                                                   |
+| ------------------------ | ----------------------------------------------------------------------------- |
+| `dashboard`              | Root dashboard grid container.                                                |
+| `dashboardDismissActive` | Dashboard container when active item is dragged outside to dismiss.           |
+| `dashboardLocked`        | Dashboard container when layout is globally locked.                           |
+| `pane`                   | Outer container div of each `<Pane>`.                                         |
+| `paneLocked`             | Pane container wrapper when locked.                                           |
+| `paneContainer`          | Pane inner content container wrapper.                                         |
+| `paneHeader`             | Drag header wrapper inside the pane.                                          |
+| `paneControls`           | Controls wrapper container (maximizing, close, lock).                         |
+| `paneButton`             | Maximize/Close control buttons.                                               |
+| `dropPreview`            | Preview indicator box for edge layout splits.                                 |
+| `rootDropPreview`        | Preview indicator for full layout splits.                                     |
+| `dragOverlay`            | Absolute portal wrapper following the dragging cursor.                        |
+| `paneDragPreview`        | Outer wrapper container of a pane drag preview node.                          |
+| `tabDragPreview`         | Outer wrapper container of a tab drag preview node.                           |
+| `resizer`                | Pointer-drag splitter handle bars.                                            |
+| `dismissPreview`         | Background indicator showing visual drag-to-dismiss zones.                    |
+| `lockedPreview`          | Hover visual feedback indicator for locked pane zones.                        |
+| `tabDropPreview`         | Tab list insertion indicator line.                                            |
+| `tabSeparator`           | Line separator between static tabs.                                           |
+| `tabContentWrapper`      | Custom tab content element wrapper.                                           |
+| `tabsContainer`          | Layout tabs container header bar.                                             |
+| `tab`                    | Individual tab list items.                                                    |
+| `tabCloseButton`         | Close button inside a tab item.                                               |
+| `dragHandle`             | Drag target region.                                                           |
+| `popoutPlaceholder`      | Custom placeholder container when a tab is popped out into a separate window. |
 
 ---
 

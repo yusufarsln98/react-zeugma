@@ -203,6 +203,15 @@ export interface ZeugmaClassNames {
   tabCloseButton?: string
   /** CSS class applied to the drag handle. */
   dragHandle?: string
+  /** CSS class applied to the popout placeholder wrapper when a tab is popped out. */
+  popoutPlaceholder?: string
+}
+
+export interface PopoutPlaceholderProps {
+  /** The unique ID of the tab that is popped out into a new window. */
+  tabId: string
+  /** Callback to dock the tab back into the main layout. */
+  dock: () => void
 }
 
 export interface DragOverlayActiveItem {
@@ -268,6 +277,8 @@ export interface BaseZeugmaProps {
     window: Window
     children: React.ReactNode
   }) => React.ReactNode
+  /** [Experimental] Optional custom renderer for the placeholder shown in a pane when its active tab is popped out into a new window. */
+  renderPopoutPlaceholder?: (props: PopoutPlaceholderProps) => ReactNode
 }
 
 export interface ZeugmaPersistOptions {
@@ -338,6 +349,8 @@ export interface ZeugmaStateValue extends ZeugmaState, ZeugmaQueries {
     window: Window
     children: React.ReactNode
   }) => React.ReactNode
+  /** [Experimental] Optional custom renderer for the placeholder shown in a pane when its active tab is popped out into a new window. */
+  renderPopoutPlaceholder?: (props: PopoutPlaceholderProps) => ReactNode
 }
 
 export interface ZeugmaDragStateValue {

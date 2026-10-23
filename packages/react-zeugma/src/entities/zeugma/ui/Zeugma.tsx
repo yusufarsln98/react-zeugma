@@ -75,6 +75,7 @@ const ZeugmaProviderInternal: React.FC<
     // Persistence
     persist = false,
     renderPopoutWrapper,
+    renderPopoutPlaceholder,
   } = props
 
   const internalController = controller as ZeugmaControllerInternal
@@ -219,6 +220,7 @@ const ZeugmaProviderInternal: React.FC<
       poppedOutTabIds,
       isTabPoppedOut,
       renderPopoutWrapper,
+      renderPopoutPlaceholder,
     }),
     [
       layout,
@@ -250,6 +252,7 @@ const ZeugmaProviderInternal: React.FC<
       poppedOutTabIds,
       isTabPoppedOut,
       renderPopoutWrapper,
+      renderPopoutPlaceholder,
     ],
   )
 

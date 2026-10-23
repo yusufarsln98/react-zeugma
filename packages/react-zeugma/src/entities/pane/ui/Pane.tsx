@@ -7,6 +7,7 @@ import {
   TabDetails,
   paneDropId,
   lockedDropId,
+  PopoutPlaceholderProps,
 } from '../../../shared'
 import { findPaneOrContainingTab, findPaneContainingTab } from '../../../shared/lib/tree'
 import { DragListenersCtx } from '../model/context'
@@ -41,6 +42,8 @@ export const usePaneContext = () => {
   return context
 }
 
+export type { PopoutPlaceholderProps }
+
 export interface PaneContentProps {
   /** A render callback (tab) => ReactNode or static ReactNode content to render for the active tab. */
   children?: React.ReactNode | ((tab: TabDetails) => React.ReactNode)
@@ -48,11 +51,22 @@ export interface PaneContentProps {
   className?: string
   /** Custom inline CSS style applied to the tab content wrapper. */
   style?: React.CSSProperties
+  /** Optional custom renderer for the placeholder shown when the active tab is popped out into a separate window. */
+  renderPopoutPlaceholder?: (props: PopoutPlaceholderProps) => React.ReactNode
 }
 
-export const PaneContent: React.FC<PaneContentProps> = ({ children, className, style }) => {
+export const PaneContent: React.FC<PaneContentProps> = ({
+  children,
+  className,
+  style,
+  renderPopoutPlaceholder: propRenderPopoutPlaceholder,
+}) => {
   const { activeTabId } = usePaneContext()
-  const { classNames, isTabPoppedOut } = useZeugmaState()
+  const {
+    classNames,
+    isTabPoppedOut,
+    renderPopoutPlaceholder: globalRenderPopoutPlaceholder,
+  } = useZeugmaState()
   const { dockTab } = useZeugmaActions()
   const targetRef = useRef<HTMLDivElement | null>(null)
   const portalRegistry = useContext(PortalRegistryContext)
@@ -80,6 +94,7 @@ export const PaneContent: React.FC<PaneContentProps> = ({ children, className, s
   }, [activeTabId, registerPortalTarget])
 
   const poppedOut = isTabPoppedOut(activeTabId)
+  const renderPlaceholder = propRenderPopoutPlaceholder ?? globalRenderPopoutPlaceholder
 
   return (
     <div
@@ -93,53 +108,18 @@ export const PaneContent: React.FC<PaneContentProps> = ({ children, className, s
         ...style,
       }}
     >
-      {poppedOut && (
-        <div
-          className="zeugma-popout-placeholder"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '12px',
-            padding: '24px',
-            textAlign: 'center',
-            backgroundColor: '#161719',
-            color: '#94a3b8',
-            fontSize: '13px',
-            fontWeight: 500,
-          }}
-        >
-          <div>This panel is open in a new window</div>
-          <button
-            onClick={() => dockTab(activeTabId)}
-            style={{
-              padding: '6px 12px',
-              fontSize: '11px',
-              fontWeight: 600,
-              borderRadius: '4px',
-              backgroundColor: '#2563eb',
-              color: '#ffffff',
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#1d4ed8'
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#2563eb'
-            }}
-          >
-            Dock Back
-          </button>
-        </div>
-      )}
+      {poppedOut &&
+        (renderPlaceholder ? (
+          classNames.popoutPlaceholder ? (
+            <div className={classNames.popoutPlaceholder}>
+              {renderPlaceholder({ tabId: activeTabId, dock: () => dockTab(activeTabId) })}
+            </div>
+          ) : (
+            renderPlaceholder({ tabId: activeTabId, dock: () => dockTab(activeTabId) })
+          )
+        ) : classNames.popoutPlaceholder ? (
+          <div className={classNames.popoutPlaceholder} />
+        ) : null)}
     </div>
   )
 }
