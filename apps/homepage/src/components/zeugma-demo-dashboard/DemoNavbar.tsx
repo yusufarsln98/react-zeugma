@@ -42,13 +42,15 @@ export function DemoNavbar() {
       </div>
 
       <div className="flex items-center gap-2">
-        <Link
-          href="/docs"
+        <a
+          href="/SKILL.md"
+          target="_blank"
+          rel="noreferrer"
           className="flex items-center gap-1 text-[11px] font-medium text-[var(--demo-muted)] hover:text-[var(--demo-text-bright)] hover:bg-[var(--demo-panel)] px-2.5 py-1 rounded-md transition-colors"
         >
           <BookOpen className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Docs</span>
-        </Link>
+          <span className="hidden sm:inline">AI Spec</span>
+        </a>
         <Link
           href="/changelog"
           className="flex items-center gap-1 text-[11px] font-medium text-[var(--demo-muted)] hover:text-[var(--demo-text-bright)] hover:bg-[var(--demo-panel)] px-2.5 py-1 rounded-md transition-colors"

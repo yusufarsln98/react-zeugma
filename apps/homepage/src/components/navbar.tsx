@@ -1,24 +1,21 @@
 'use client'
 
-import { Sun, Moon, Menu, X, Search } from 'lucide-react'
+import { Sun, Moon, Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useRef, useState, useEffect } from 'react'
 import { BrandIcon } from './brand-icon'
 import { useTheme } from './theme-provider'
-import { SearchModal } from '../views/docs/search-modal'
-import { docsData } from '../config/docs-data'
 
 const LOGO_URL = '/logo.png'
 
 export const NAV_ITEMS: {
   label: string
-  to: '/' | '/demo' | '/docs' | '/changelog'
+  to: '/' | '/demo' | '/changelog'
   badge?: string
 }[] = [
   { label: 'Overview', to: '/' },
   { label: 'Live Demo', to: '/demo', badge: 'Interactive' },
-  { label: 'Documentation', to: '/docs' },
   { label: 'Changelog', to: '/changelog' },
 ]
 
@@ -28,35 +25,11 @@ export function Navbar() {
   const router = useRouter()
   const prefetched = useRef<Set<string>>(new Set())
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchModalOpen, setSearchModalOpen] = useState(false)
 
   // Automatically close mobile menu when path changes
   useEffect(() => {
     setMobileMenuOpen(false)
   }, [pathname])
-
-  // Keyboard shortcut listener: Cmd/Ctrl + K or /
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement
-      const isInput =
-        target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
-
-      if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && !isInput)) {
-        e.preventDefault()
-        setSearchModalOpen(true)
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
-
-  // Listen for global open-search event
-  useEffect(() => {
-    const handleOpen = () => setSearchModalOpen(true)
-    window.addEventListener('open-search', handleOpen)
-    return () => window.removeEventListener('open-search', handleOpen)
-  }, [])
 
   const prefetch = useCallback(
     (href: string) => {
@@ -66,14 +39,6 @@ export function Navbar() {
     },
     [router],
   )
-
-  const handleSelectResult = (id: string) => {
-    if (pathname === '/docs') {
-      window.dispatchEvent(new CustomEvent('scroll-to-section', { detail: id }))
-    } else {
-      router.push(`/docs#${id}`)
-    }
-  }
 
   const appVersion = process.env.NEXT_PUBLIC_APP_VERSION || '7.1.2'
 
@@ -123,19 +88,6 @@ export function Navbar() {
 
         {/* Right Action Controls */}
         <div className="flex items-center gap-2">
-          {/* Search Trigger */}
-          <button
-            onClick={() => setSearchModalOpen(true)}
-            className="flex items-center justify-between gap-3 px-3 py-1.5 bg-bg-pane border border-border-primary rounded-lg text-xs text-text-muted hover:text-text-primary hover:border-border-secondary transition-all cursor-pointer font-medium w-36 lg:w-48 shadow-2xs"
-            aria-label="Search documentation"
-          >
-            <div className="flex items-center gap-2 truncate">
-              <Search className="h-3.5 w-3.5 text-accent shrink-0" />
-              <span className="truncate">Search docs...</span>
-            </div>
-            <kbd className="kbd text-[9px]">⌘K</kbd>
-          </button>
-
           {/* Theme Switcher */}
           <button
             onClick={toggleTheme}
@@ -230,13 +182,6 @@ export function Navbar() {
           </div>
         </div>
       )}
-
-      <SearchModal
-        isOpen={searchModalOpen}
-        onClose={() => setSearchModalOpen(false)}
-        sections={docsData}
-        onSelectResult={handleSelectResult}
-      />
     </header>
   )
 }

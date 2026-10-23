@@ -107,43 +107,6 @@ export const homeMetadata: Metadata = {
   },
 }
 
-export const docsMetadata: Metadata = {
-  title: 'Documentation & API Reference',
-  description:
-    'Comprehensive API references, quick-start guides, tree mutation utilities, layout state controller, and migration guide from react-mosaic to react-zeugma.',
-  keywords: [
-    ...SEO_KEYWORDS,
-    'react-zeugma documentation',
-    'react layout engine api',
-    'tree layout structure react',
-    'migrate from react-mosaic',
-  ],
-  openGraph: {
-    title: 'Documentation & API Reference — react-zeugma',
-    description:
-      'Comprehensive API references, quick-start guides, tree mutation utilities, layout state controller, and migration guide from react-mosaic to react-zeugma.',
-    url: `${SEO_CONSTANTS.siteUrl}/docs`,
-    images: [
-      {
-        url: SEO_CONSTANTS.ogImage,
-        width: 1024,
-        height: 1024,
-        alt: 'react-zeugma Documentation',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Documentation & API Reference — react-zeugma',
-    description:
-      'Learn how to build recursive workspace layouts, customize splitters, and manage multi-tab panes with react-zeugma.',
-    images: [SEO_CONSTANTS.ogImage],
-  },
-  alternates: {
-    canonical: '/docs',
-  },
-}
-
 export const demoMetadata: Metadata = {
   title: 'Live Interactive Demo — Observability Cockpit & Layout Engine',
   description:
