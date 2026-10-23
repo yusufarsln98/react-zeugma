@@ -12,7 +12,7 @@ import {
   ChevronRight,
   SlidersHorizontal,
 } from 'lucide-react'
-import { ZeugmaController, TreeNode, PaneNode, SplitDirection } from 'react-zeugma'
+import { ZeugmaController, TreeNode, PaneNode, SplitDirection } from 'react-zeugma/react'
 import { AVAILABLE_WIDGETS, WIDGET_META, PRESETS } from './constants'
 
 interface DashboardDrawerProps {

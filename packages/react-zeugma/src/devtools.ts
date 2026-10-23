@@ -1,1 +1,1 @@
-export * from './devtools/index'
+export * from './react/devtools/index'

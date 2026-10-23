@@ -16,7 +16,7 @@ export function PanelChrome({
   return <>{children}</>
 }
 
-import { useZeugmaContext } from 'react-zeugma'
+import { useZeugmaContext } from 'react-zeugma/react'
 import { defaultDashboardLayout } from './constants'
 
 export function DashboardToolbar({
