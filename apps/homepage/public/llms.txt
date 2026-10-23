@@ -121,7 +121,7 @@ export default function WorkspaceApp() {
 - `<PaneTree renderPane={...} />`: Renders split tree when `<Zeugma>` is used as a context provider with children.
 - `<Pane id={id} locked={false}>`: Individual panel wrapper establishing drag-and-drop boundary.
 - `<Pane.DragHandle>`: Draggable region within pane.
-- `<Pane.Content>`: Tab content renderer (accepts children or render function `(tab) => ReactNode`).
+- `<Pane.Content>`: Tab content renderer (accepts children or render function `(tab) => ReactNode`, and optional `renderPopoutPlaceholder`).
 - `<Pane.Controls>`: Maximize/fullscreen and close buttons.
 - `<Tabs tabIds={...} activeTabId={...} selectTab={...} removeTab={...} />`: Tab strip container and reorderable tabs.
 - `useZeugma(options)`: Layout state controller hook.

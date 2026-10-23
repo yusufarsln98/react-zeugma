@@ -608,4 +608,158 @@ describe('Tab Drop Preview rendering', () => {
     expect(tabDragCall).toBeDefined()
     expect(tabDragCall![0].disabled).toBe(true)
   })
+
+  it('should not render hardcoded text or buttons when a tab is popped out without placeholder', () => {
+    const mockWindow = {
+      document: document.implementation.createHTMLDocument('Popout'),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      close: vi.fn(),
+      focus: vi.fn(),
+    }
+    const openSpy = vi.spyOn(window, 'open').mockReturnValue(mockWindow as unknown as Window)
+
+    const testLayout: TreeNode = {
+      type: 'pane',
+      id: 'pane-1',
+      tabIds: ['tab-1'],
+      activeTabId: 'tab-1',
+    }
+    let controllerRef: ZeugmaController | null = null
+
+    const TestWrapper = () => {
+      const controller = useZeugma({ initialLayout: testLayout })
+      controllerRef = controller
+      return (
+        <Zeugma
+          controller={controller}
+          renderPane={(id) => (
+            <Pane id={id}>
+              <Pane.Content>{(tab) => <div data-testid="tab-content">{tab.id}</div>}</Pane.Content>
+            </Pane>
+          )}
+        />
+      )
+    }
+
+    render(<TestWrapper />)
+
+    act(() => {
+      controllerRef?.popoutTab('tab-1')
+    })
+
+    // Should NOT have hardcoded text or button
+    expect(screen.queryByText('This panel is open in a new window')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Dock Back' })).toBeNull()
+    expect(screen.queryByText('Dock Back')).toBeNull()
+    openSpy.mockRestore()
+  })
+
+  it('should render custom popout placeholder when provided to Pane.Content', () => {
+    const mockWindow = {
+      document: document.implementation.createHTMLDocument('Popout'),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      close: vi.fn(),
+      focus: vi.fn(),
+    }
+    const openSpy = vi.spyOn(window, 'open').mockReturnValue(mockWindow as unknown as Window)
+
+    const testLayout: TreeNode = {
+      type: 'pane',
+      id: 'pane-1',
+      tabIds: ['tab-1'],
+      activeTabId: 'tab-1',
+    }
+    let controllerRef: ZeugmaController | null = null
+
+    const TestWrapper = () => {
+      const controller = useZeugma({ initialLayout: testLayout })
+      controllerRef = controller
+      return (
+        <Zeugma
+          controller={controller}
+          renderPane={(id) => (
+            <Pane id={id}>
+              <Pane.Content
+                renderPopoutPlaceholder={({ tabId, dock }) => (
+                  <div data-testid="custom-placeholder">
+                    <span>Popped out: {tabId}</span>
+                    <button onClick={dock} data-testid="dock-btn">
+                      Re-dock
+                    </button>
+                  </div>
+                )}
+              >
+                {(tab) => <div data-testid="tab-content">{tab.id}</div>}
+              </Pane.Content>
+            </Pane>
+          )}
+        />
+      )
+    }
+
+    render(<TestWrapper />)
+
+    act(() => {
+      controllerRef?.popoutTab('tab-1')
+    })
+
+    expect(screen.getByTestId('custom-placeholder')).toBeDefined()
+    expect(screen.getByText('Popped out: tab-1')).toBeDefined()
+
+    act(() => {
+      screen.getByTestId('dock-btn').click()
+    })
+
+    expect(screen.queryByTestId('custom-placeholder')).toBeNull()
+    openSpy.mockRestore()
+  })
+
+  it('should render custom popout placeholder when provided globally to Zeugma', () => {
+    const mockWindow = {
+      document: document.implementation.createHTMLDocument('Popout'),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      close: vi.fn(),
+      focus: vi.fn(),
+    }
+    const openSpy = vi.spyOn(window, 'open').mockReturnValue(mockWindow as unknown as Window)
+
+    const testLayout: TreeNode = {
+      type: 'pane',
+      id: 'pane-1',
+      tabIds: ['tab-1'],
+      activeTabId: 'tab-1',
+    }
+    let controllerRef: ZeugmaController | null = null
+
+    const TestWrapper = () => {
+      const controller = useZeugma({ initialLayout: testLayout })
+      controllerRef = controller
+      return (
+        <Zeugma
+          controller={controller}
+          renderPopoutPlaceholder={({ tabId }) => (
+            <div data-testid="global-placeholder">Global popout for {tabId}</div>
+          )}
+          renderPane={(id) => (
+            <Pane id={id}>
+              <Pane.Content>{(tab) => <div data-testid="tab-content">{tab.id}</div>}</Pane.Content>
+            </Pane>
+          )}
+        />
+      )
+    }
+
+    render(<TestWrapper />)
+
+    act(() => {
+      controllerRef?.popoutTab('tab-1')
+    })
+
+    expect(screen.getByTestId('global-placeholder')).toBeDefined()
+    expect(screen.getByText('Global popout for tab-1')).toBeDefined()
+    openSpy.mockRestore()
+  })
 })

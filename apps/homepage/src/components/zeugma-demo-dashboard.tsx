@@ -158,7 +158,20 @@ function ZeugmaDemoDashboardInner() {
           >
             <DashboardPaneHeader />
 
-            <Pane.Content className="grafana-panel-body flex-1 min-h-0 overflow-hidden">
+            <Pane.Content
+              className="grafana-panel-body flex-1 min-h-0 overflow-hidden"
+              renderPopoutPlaceholder={({ dock }) => (
+                <div className="flex flex-col items-center justify-center h-full w-full gap-3 text-text-muted text-xs p-6 text-center select-none">
+                  <span>Panel is open in a separate window</span>
+                  <button
+                    onClick={dock}
+                    className="px-2.5 py-1 text-xs rounded border border-border-primary bg-bg-pane text-text-primary hover:bg-bg-hover transition-colors cursor-pointer"
+                  >
+                    Dock Back
+                  </button>
+                </div>
+              )}
+            >
               {renderWidget}
             </Pane.Content>
           </div>

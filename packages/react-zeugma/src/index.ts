@@ -11,6 +11,7 @@ export type {
   RenderTabProps,
   SplitDirection,
   DragOverlayActiveItem,
+  PopoutPlaceholderProps,
 } from './shared'
 export { useZeugma, useZeugmaContext } from './entities/zeugma'
 export { useResizer } from './features/resize-pane'
@@ -18,6 +19,7 @@ export { PaneTree } from './widgets/pane-tree'
 export { Pane, usePaneContext } from './entities/pane'
 export type {
   PaneProps,
+  PaneContentProps,
   DragHandleProps,
   PaneRenderProps,
   TabsProps,
