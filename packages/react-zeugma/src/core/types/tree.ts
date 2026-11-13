@@ -21,7 +21,6 @@ export interface PaneNode {
   tabIds: string[]
   activeTabId: string
   locked?: boolean
-  tabsMetadata?: Record<string, Record<string, unknown>>
 }
 
 export type TreeNode = SplitNode | PaneNode
@@ -31,7 +30,7 @@ export interface TabDetails {
   paneId: string
   isActive: boolean
   index: number
-  metadata: Record<string, unknown> | undefined
+  metadata?: Record<string, unknown>
 }
 
 export type MetadataUpdater =
@@ -46,7 +45,7 @@ export interface UseZeugmaOptions {
   initialLayout?: TreeNode | null
   /** Controlled layout tree model. If provided, the hook will run in controlled mode and sync with this value. */
   layout?: TreeNode | null
-  /** Initial per-tab metadata map for uncontrolled mode, independent of the layout tree. Takes precedence over `PaneNode.tabsMetadata`. */
+  /** Initial per-tab metadata map for uncontrolled mode, independent of the layout tree. */
   initialMetadata?: TabMetadataMap
   /** Controlled per-tab metadata map. When provided, metadata stays synchronized with this map while remaining consistent with the layout tree. */
   metadata?: TabMetadataMap

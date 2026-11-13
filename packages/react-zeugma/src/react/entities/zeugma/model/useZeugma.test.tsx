@@ -195,17 +195,21 @@ describe('useZeugma Hook', () => {
     expect(result.current.removePane).toBe(initialRemovePane)
   })
 
-  it('should initialize and preserve immutable tab metadata', () => {
-    const layoutWithMeta: PaneNode = {
+  it('should initialize and preserve tab metadata independently of layout', () => {
+    const layoutWithoutMeta: PaneNode = {
       type: 'pane',
       id: 'pane-1',
       tabIds: ['tab-1'],
       activeTabId: 'tab-1',
-      tabsMetadata: {
-        'tab-1': { title: 'Initial Title' },
-      },
     }
-    const { result } = renderHook(() => useZeugma({ initialLayout: layoutWithMeta }))
+    const { result } = renderHook(() =>
+      useZeugma({
+        initialLayout: layoutWithoutMeta,
+        initialMetadata: {
+          'tab-1': { title: 'Initial Title' },
+        },
+      }),
+    )
 
     expect(result.current.getTabMetadata('tab-1')).toEqual({ title: 'Initial Title' })
     expect(result.current.getActiveTabMetadata('pane-1')).toEqual({ title: 'Initial Title' })
@@ -215,26 +219,28 @@ describe('useZeugma Hook', () => {
       result.current.addTab('tab-2', 'pane-1', { title: 'Tab 2 Title' })
     })
 
-    const pane = result.current.layout as PaneNode
-    expect(pane.tabsMetadata?.['tab-1']).toEqual({ title: 'Initial Title' })
-    expect(pane.tabsMetadata?.['tab-2']).toEqual({ title: 'Tab 2 Title' })
+    expect(result.current.getTabMetadata('tab-1')).toEqual({ title: 'Initial Title' })
     expect(result.current.getTabMetadata('tab-2')).toEqual({ title: 'Tab 2 Title' })
   })
 
   it('should update tab metadata without changing layout reference and fire onMetadataChange', () => {
-    const layoutWithMeta: PaneNode = {
+    const layoutWithoutMeta: PaneNode = {
       type: 'pane',
       id: 'pane-1',
       tabIds: ['tab-1'],
       activeTabId: 'tab-1',
-      tabsMetadata: {
-        'tab-1': { title: 'Initial', count: 1 },
-      },
     }
     const onChange = vi.fn()
     const onMetadataChange = vi.fn()
     const { result } = renderHook(() =>
-      useZeugma({ initialLayout: layoutWithMeta, onChange, onMetadataChange }),
+      useZeugma({
+        initialLayout: layoutWithoutMeta,
+        initialMetadata: {
+          'tab-1': { title: 'Initial', count: 1 },
+        },
+        onChange,
+        onMetadataChange,
+      }),
     )
 
     const initialLayoutRef = result.current.layout
@@ -400,21 +406,23 @@ describe('useZeugma Hook', () => {
         id: 'pane-1',
         tabIds: ['tab-1', 'tab-2'],
         activeTabId: 'tab-1',
-        tabsMetadata: {
-          'tab-1': { label: 'Tab 1' },
-        },
       },
       second: {
         type: 'pane',
         id: 'pane-2',
         tabIds: ['tab-3', 'tab-4'],
         activeTabId: 'tab-3',
-        tabsMetadata: {
-          'tab-3': { label: 'Tab 3' },
-        },
       },
     }
-    const { result } = renderHook(() => useZeugma({ initialLayout: layoutWithSplit }))
+    const { result } = renderHook(() =>
+      useZeugma({
+        initialLayout: layoutWithSplit,
+        initialMetadata: {
+          'tab-1': { label: 'Tab 1' },
+          'tab-3': { label: 'Tab 3' },
+        },
+      }),
+    )
 
     act(() => {
       result.current.moveTab('tab-1', 'tab-3', 'center')
@@ -426,13 +434,11 @@ describe('useZeugma Hook', () => {
 
     expect(firstPane.tabIds).toEqual(['tab-3', 'tab-2'])
     expect(firstPane.activeTabId).toBe('tab-3')
-    expect(firstPane.tabsMetadata?.['tab-3']).toEqual({ label: 'Tab 3' })
-    expect(firstPane.tabsMetadata?.['tab-1']).toBeUndefined()
+    expect(result.current.getTabMetadata('tab-3')).toEqual({ label: 'Tab 3' })
 
     expect(secondPane.tabIds).toEqual(['tab-1', 'tab-4'])
     expect(secondPane.activeTabId).toBe('tab-1')
-    expect(secondPane.tabsMetadata?.['tab-1']).toEqual({ label: 'Tab 1' })
-    expect(secondPane.tabsMetadata?.['tab-3']).toBeUndefined()
+    expect(result.current.getTabMetadata('tab-1')).toEqual({ label: 'Tab 1' })
   })
 
   it('should support popout and dock actions', () => {

@@ -69,14 +69,11 @@ export function resolveDrop(input: ResolveDropInput): ResolveDropResult {
 
     let draggedPaneNode: PaneNode
     if (isTabDrag) {
-      const originalPane = findPaneContainingTab(layout, draggingId)
-      const sourceMetadata = originalPane?.tabsMetadata?.[draggingId]
       draggedPaneNode = {
         type: 'pane',
         id: generateUniqueId(),
         tabIds: [draggingId],
         activeTabId: draggingId,
-        tabsMetadata: sourceMetadata ? { [draggingId]: sourceMetadata } : undefined,
       }
     } else {
       draggedPaneNode = findPaneById(layout, draggingId) ?? {
@@ -161,14 +158,11 @@ export function resolveDrop(input: ResolveDropInput): ResolveDropResult {
 
     let draggedPaneNode: PaneNode
     if (isTabDrag) {
-      const originalPane = findPaneContainingTab(layout, draggingId)
-      const sourceMetadata = originalPane?.tabsMetadata?.[draggingId]
       draggedPaneNode = {
         type: 'pane',
         id: generateUniqueId(),
         tabIds: [draggingId],
         activeTabId: draggingId,
-        tabsMetadata: sourceMetadata ? { [draggingId]: sourceMetadata } : undefined,
       }
     } else {
       draggedPaneNode = findPaneById(layout, draggingId) ?? {

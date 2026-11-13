@@ -1,5 +1,5 @@
 import type { TreeNode } from '../types'
-import { compactMetadata, createPane } from './factory'
+import { createPane } from './factory'
 import { mapPanes } from './traverse'
 import { findPaneById, findPaneContainingTab } from './query'
 import { insertLeaf, removePane } from './mutate-pane'
@@ -18,16 +18,10 @@ export function removeTab(tree: TreeNode | null, tabId: string): TreeNode | null
       newActive = newTabs[0]
     }
 
-    const newTabsMetadata = pane.tabsMetadata ? { ...pane.tabsMetadata } : undefined
-    if (newTabsMetadata) {
-      delete newTabsMetadata[tabId]
-    }
-
     return {
       ...pane,
       tabIds: newTabs,
       activeTabId: newActive,
-      tabsMetadata: compactMetadata(newTabsMetadata),
     }
   })
 }
@@ -39,10 +33,9 @@ export function addTab(
   tree: TreeNode | null,
   targetPaneId: string | undefined | null,
   tabId: string,
-  metadata?: Record<string, unknown>,
 ): TreeNode | null {
   if (tree === null) {
-    return createPane(tabId, metadata)
+    return createPane(tabId)
   }
 
   const targetPane = targetPaneId ? findPaneById(tree, targetPaneId) : null
@@ -53,23 +46,15 @@ export function addTab(
       if (!newTabs.includes(tabId)) {
         newTabs.push(tabId)
       }
-      let newTabsMetadata = pane.tabsMetadata
-      if (metadata) {
-        newTabsMetadata = {
-          ...pane.tabsMetadata,
-          [tabId]: metadata,
-        }
-      }
       return {
         ...pane,
         tabIds: newTabs,
         activeTabId: tabId,
-        tabsMetadata: newTabsMetadata,
       }
     })
   }
 
-  return insertLeaf(tree, createPane(tabId, metadata))
+  return insertLeaf(tree, createPane(tabId))
 }
 
 /**
@@ -93,12 +78,9 @@ export function mergeTab(
 ): TreeNode | null {
   if (tree === null) return null
 
-  const sourcePane = findPaneContainingTab(tree, draggedTabId)
-  const sourceMetadata = sourcePane?.tabsMetadata?.[draggedTabId]
-
   const cleanTree = removeTab(tree, draggedTabId)
   if (cleanTree === null) {
-    return createPane(draggedTabId, sourceMetadata)
+    return createPane(draggedTabId)
   }
 
   return mapPanes(cleanTree, (pane) => {
@@ -107,15 +89,10 @@ export function mergeTab(
     if (!newTabs.includes(draggedTabId)) {
       newTabs.push(draggedTabId)
     }
-    const newTabsMetadata = { ...pane.tabsMetadata }
-    if (sourceMetadata) {
-      newTabsMetadata[draggedTabId] = sourceMetadata
-    }
     return {
       ...pane,
       tabIds: newTabs,
       activeTabId: draggedTabId,
-      tabsMetadata: compactMetadata(newTabsMetadata),
     }
   })
 }
@@ -136,8 +113,6 @@ export function swapTabs(
 
   const sourcePaneId = sourcePane.id
   const targetPaneId = targetPane.id
-  const sourceMetadata = sourcePane.tabsMetadata?.[draggedTabId]
-  const targetMetadata = targetPane.tabsMetadata?.[targetTabId]
 
   return mapPanes(tree, (pane) => {
     if (pane.id !== sourcePaneId && pane.id !== targetPaneId) {
@@ -146,7 +121,6 @@ export function swapTabs(
 
     let newTabIds = [...pane.tabIds]
     let newActiveTabId = pane.activeTabId
-    const newTabsMetadata = pane.tabsMetadata ? { ...pane.tabsMetadata } : {}
 
     if (sourcePaneId === targetPaneId) {
       const dragIdx = newTabIds.indexOf(draggedTabId)
@@ -162,19 +136,11 @@ export function swapTabs(
         if (newActiveTabId === draggedTabId) {
           newActiveTabId = targetTabId
         }
-        delete newTabsMetadata[draggedTabId]
-        if (targetMetadata) {
-          newTabsMetadata[targetTabId] = targetMetadata
-        }
       }
       if (pane.id === targetPaneId) {
         newTabIds = newTabIds.map((id) => (id === targetTabId ? draggedTabId : id))
         if (newActiveTabId === targetTabId) {
           newActiveTabId = draggedTabId
-        }
-        delete newTabsMetadata[targetTabId]
-        if (sourceMetadata) {
-          newTabsMetadata[draggedTabId] = sourceMetadata
         }
       }
     }
@@ -183,7 +149,6 @@ export function swapTabs(
       ...pane,
       tabIds: newTabIds,
       activeTabId: newActiveTabId,
-      tabsMetadata: compactMetadata(newTabsMetadata),
     }
   })
 }
@@ -203,12 +168,9 @@ export function moveTab(
     return swapTabs(tree, draggedTabId, targetTabId)
   }
 
-  const sourcePane = findPaneContainingTab(tree, draggedTabId)
-  const sourceMetadata = sourcePane?.tabsMetadata?.[draggedTabId]
-
   const cleanTree = removeTab(tree, draggedTabId)
   if (cleanTree === null) {
-    return createPane(draggedTabId, sourceMetadata)
+    return createPane(draggedTabId)
   }
 
   return mapPanes(cleanTree, (pane) => {
@@ -225,16 +187,10 @@ export function moveTab(
     }
     filteredTabs.splice(insertIndex, 0, draggedTabId)
 
-    const newTabsMetadata = { ...pane.tabsMetadata }
-    if (sourceMetadata) {
-      newTabsMetadata[draggedTabId] = sourceMetadata
-    }
-
     return {
       ...pane,
       tabIds: filteredTabs,
       activeTabId: draggedTabId,
-      tabsMetadata: compactMetadata(newTabsMetadata),
     }
   })
 }
@@ -255,7 +211,6 @@ export function movePaneTabs(
 
   const draggedTabIds = sourcePane.tabIds
   const draggedActiveTabId = sourcePane.activeTabId
-  const draggedTabsMetadata = sourcePane.tabsMetadata || {}
 
   const cleanTree = removePane(tree, draggedPaneId)
   if (cleanTree === null) {
@@ -276,18 +231,10 @@ export function movePaneTabs(
     }
     filteredTabs.splice(insertIndex, 0, ...draggedTabIds)
 
-    const newTabsMetadata = { ...pane.tabsMetadata }
-    for (const tid of draggedTabIds) {
-      if (draggedTabsMetadata[tid]) {
-        newTabsMetadata[tid] = draggedTabsMetadata[tid]
-      }
-    }
-
     return {
       ...pane,
       tabIds: filteredTabs,
       activeTabId: draggedActiveTabId,
-      tabsMetadata: compactMetadata(newTabsMetadata),
     }
   })
 }

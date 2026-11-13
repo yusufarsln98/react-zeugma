@@ -10,8 +10,6 @@ import {
   findPaneById,
   findPaneContainingTab,
   findTabById,
-  getTabMetadata,
-  getActiveTabMetadata,
   updatePaneLock,
   selectTab,
   mergeTab,
@@ -31,10 +29,6 @@ describe('Tree Helpers Characterization Tests', () => {
     id: 'p1',
     tabIds: ['t1', 't2'],
     activeTabId: 't1',
-    tabsMetadata: {
-      t1: { title: 'Tab 1' },
-      t2: { title: 'Tab 2' },
-    },
   }
 
   const splitTree: SplitNode = {
@@ -46,14 +40,12 @@ describe('Tree Helpers Characterization Tests', () => {
       id: 'p1',
       tabIds: ['t1'],
       activeTabId: 't1',
-      tabsMetadata: { t1: { title: 'Tab 1' } },
     },
     second: {
       type: 'pane',
       id: 'p2',
       tabIds: ['t2', 't3'],
       activeTabId: 't2',
-      tabsMetadata: { t2: { title: 'Tab 2' } },
     },
   }
 
@@ -108,7 +100,6 @@ describe('Tree Helpers Characterization Tests', () => {
         paneId: 'p2',
         isActive: false,
         index: 1,
-        metadata: undefined,
       })
 
       const t1Details = findTabById(splitTree, 't1')
@@ -117,24 +108,10 @@ describe('Tree Helpers Characterization Tests', () => {
         paneId: 'p1',
         isActive: true,
         index: 0,
-        metadata: { title: 'Tab 1' },
       })
 
       expect(findTabById(splitTree, 'missing')).toBeNull()
       expect(findTabById(null, 't1')).toBeNull()
-    })
-
-    it('retrieves tab metadata', () => {
-      expect(getTabMetadata(splitTree, 't1')).toEqual({ title: 'Tab 1' })
-      expect(getTabMetadata(splitTree, 't3')).toBeUndefined()
-      expect(getTabMetadata(null, 't1')).toBeUndefined()
-    })
-
-    it('retrieves active tab metadata for a pane', () => {
-      expect(getActiveTabMetadata(splitTree, 'p1')).toEqual({ title: 'Tab 1' })
-      expect(getActiveTabMetadata(splitTree, 'p2')).toEqual({ title: 'Tab 2' })
-      expect(getActiveTabMetadata(splitTree, 'missing')).toBeUndefined()
-      expect(getActiveTabMetadata(null, 'p1')).toBeUndefined()
     })
   })
 
@@ -160,7 +137,6 @@ describe('Tree Helpers Characterization Tests', () => {
       const result = removeTab(singlePane, 't2') as PaneNode
       expect(result.tabIds).toEqual(['t1'])
       expect(result.activeTabId).toBe('t1')
-      expect(result.tabsMetadata).toEqual({ t1: { title: 'Tab 1' } })
     })
 
     it('activates first remaining tab when active tab is removed', () => {
@@ -172,18 +148,6 @@ describe('Tree Helpers Characterization Tests', () => {
     it('collapses pane when its last tab is removed', () => {
       const result = removeTab(splitTree, 't1') as PaneNode
       expect(result.id).toBe('p2')
-    })
-
-    it('cleans up empty metadata', () => {
-      const paneWithOneMeta: PaneNode = {
-        type: 'pane',
-        id: 'p',
-        tabIds: ['t1', 't2'],
-        activeTabId: 't1',
-        tabsMetadata: { t1: { a: 1 } },
-      }
-      const result = removeTab(paneWithOneMeta, 't1') as PaneNode
-      expect(result.tabsMetadata).toBeUndefined()
     })
   })
 
@@ -226,18 +190,16 @@ describe('Tree Helpers Characterization Tests', () => {
 
   describe('addTab', () => {
     it('creates a new pane if tree is null', () => {
-      const res = addTab(null, null, 'tab-new', { x: 1 }) as PaneNode
+      const res = addTab(null, null, 'tab-new') as PaneNode
       expect(res.type).toBe('pane')
       expect(res.tabIds).toEqual(['tab-new'])
       expect(res.activeTabId).toBe('tab-new')
-      expect(res.tabsMetadata).toEqual({ 'tab-new': { x: 1 } })
     })
 
     it('appends tab to target pane and activates it', () => {
-      const res = addTab(singlePane, 'p1', 't3', { title: 'T3' }) as PaneNode
+      const res = addTab(singlePane, 'p1', 't3') as PaneNode
       expect(res.tabIds).toEqual(['t1', 't2', 't3'])
       expect(res.activeTabId).toBe('t3')
-      expect(res.tabsMetadata?.['t3']).toEqual({ title: 'T3' })
     })
 
     it('inserts a leaf pane if target pane is not found', () => {
@@ -285,7 +247,6 @@ describe('Tree Helpers Characterization Tests', () => {
       expect(res.id).toBe('p2')
       expect(res.tabIds).toContain('t1')
       expect(res.activeTabId).toBe('t1')
-      expect(res.tabsMetadata?.['t1']).toEqual({ title: 'Tab 1' })
     })
 
     it('reorders tab before or after another in same pane', () => {

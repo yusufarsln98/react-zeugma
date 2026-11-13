@@ -8,7 +8,11 @@ import { WidgetWrapper } from './zeugma-demo-dashboard/WidgetWrapper'
 import { LiveDataProvider } from './zeugma-demo-dashboard/LiveDataProvider'
 import { ExternalLink, Maximize2, Minimize2, Pin, X } from 'lucide-react'
 
-import { WIDGET_META, defaultDashboardLayout } from './zeugma-demo-dashboard/constants'
+import {
+  WIDGET_META,
+  defaultDashboardLayout,
+  defaultDashboardMetadata,
+} from './zeugma-demo-dashboard/constants'
 
 import { DashboardDrawer } from './zeugma-demo-dashboard/DashboardDrawer'
 import {
@@ -155,7 +159,10 @@ function ZeugmaDemoDashboardInner() {
   const [minSplitPercentage, setMinSplitPercentage] = useState(5)
   const [maxSplitPercentage, setMaxSplitPercentage] = useState(95)
 
-  const controller = useZeugma({ initialLayout: defaultDashboardLayout })
+  const controller = useZeugma({
+    initialLayout: defaultDashboardLayout,
+    initialMetadata: defaultDashboardMetadata,
+  })
   const hasHydratedLayoutRef = useRef(false)
 
   // Client-side localStorage persistence using the useZeugma controller

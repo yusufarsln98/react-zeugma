@@ -234,9 +234,9 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
   const mutateAddTab = useMemo(
     () =>
       mutateLayout(
-        (prev, tabId: string, targetPaneId?: string, metadata?: Record<string, unknown>) => {
+        (prev, tabId: string, targetPaneId?: string) => {
           const cleanedPrev = removeTab(prev, tabId) ?? prev
-          return addTab(cleanedPrev, targetPaneId, tabId, metadata)
+          return addTab(cleanedPrev, targetPaneId, tabId)
         },
         { blockedInFullscreen: true },
       ),
@@ -254,7 +254,7 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
           onMetadataChangeRef.current?.(tabId, metadata)
           onMetadataMapChangeRef.current?.(store.getAll())
         }
-        mutateAddTab(tabId, targetPaneId, metadata)
+        mutateAddTab(tabId, targetPaneId)
       },
       updateTabMetadata: (tabId: string, updater: MetadataUpdater) => {
         if (layoutRef.current && !findTabById(layoutRef.current, tabId)) return

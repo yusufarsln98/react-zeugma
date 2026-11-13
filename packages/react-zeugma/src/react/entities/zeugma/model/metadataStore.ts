@@ -17,22 +17,14 @@ export interface MetadataStore {
   subscribe: (tabId: string, listener: () => void) => () => void
 }
 
-function collectTreeMetadata(tree: TreeNode | null): {
-  tabIds: Set<string>
-  metadataMap: Map<string, Record<string, unknown>>
-} {
+function collectTreeTabIds(tree: TreeNode | null): Set<string> {
   const tabIds = new Set<string>()
-  const metadataMap = new Map<string, Record<string, unknown>>()
 
   function walk(node: TreeNode | null) {
     if (!node) return
     if (node.type === 'pane') {
       for (const tabId of node.tabIds) {
         tabIds.add(tabId)
-        const meta = node.tabsMetadata?.[tabId]
-        if (meta !== undefined) {
-          metadataMap.set(tabId, meta)
-        }
       }
       return
     }
@@ -41,7 +33,7 @@ function collectTreeMetadata(tree: TreeNode | null): {
   }
 
   walk(tree)
-  return { tabIds, metadataMap }
+  return tabIds
 }
 
 /**
@@ -88,7 +80,7 @@ export function createMetadataStore(
   }
 
   function resetFromTree(tree: TreeNode | null, nextMetadata?: TabMetadataMap): string[] {
-    const { tabIds, metadataMap } = collectTreeMetadata(tree)
+    const tabIds = collectTreeTabIds(tree)
     const removedTabIds: string[] = []
 
     for (const existingId of values.keys()) {
@@ -98,9 +90,6 @@ export function createMetadataStore(
     }
 
     const nextEntries = new Map<string, Record<string, unknown>>()
-    for (const [tabId, meta] of metadataMap) {
-      nextEntries.set(tabId, meta)
-    }
     if (nextMetadata) {
       for (const [tabId, meta] of Object.entries(nextMetadata)) {
         if (!tree || tabIds.has(tabId)) {
@@ -124,27 +113,11 @@ export function createMetadataStore(
   }
 
   function syncFromTree(tree: TreeNode | null): string[] {
-    const { tabIds, metadataMap } = collectTreeMetadata(tree)
-    const removedTabIds: string[] = []
-
-    for (const existingId of Array.from(values.keys())) {
-      if (!tabIds.has(existingId)) {
-        del(existingId)
-        removedTabIds.push(existingId)
-      }
-    }
-
-    for (const [tabId, meta] of metadataMap) {
-      if (!values.has(tabId)) {
-        set(tabId, meta)
-      }
-    }
-
-    return removedTabIds
+    return pruneMissingTabs(tree)
   }
 
   function syncFromMap(nextMap: TabMetadataMap, tree: TreeNode | null): void {
-    const { tabIds } = collectTreeMetadata(tree)
+    const tabIds = collectTreeTabIds(tree)
 
     for (const existingId of Array.from(values.keys())) {
       const nextMeta = nextMap[existingId]
@@ -161,7 +134,7 @@ export function createMetadataStore(
   }
 
   function pruneMissingTabs(tree: TreeNode | null): string[] {
-    const { tabIds } = collectTreeMetadata(tree)
+    const tabIds = collectTreeTabIds(tree)
     const removedTabIds: string[] = []
     for (const existingId of Array.from(values.keys())) {
       if (!tabIds.has(existingId)) {
@@ -198,16 +171,11 @@ export function createMetadataStore(
     }
   }
 
-  if (initialTree || initialMetadata) {
-    const { tabIds, metadataMap } = collectTreeMetadata(initialTree)
-    for (const [tabId, meta] of metadataMap) {
-      values.set(tabId, meta)
-    }
-    if (initialMetadata) {
-      for (const [tabId, meta] of Object.entries(initialMetadata)) {
-        if (!initialTree || tabIds.has(tabId)) {
-          values.set(tabId, meta)
-        }
+  if (initialMetadata) {
+    const tabIds = collectTreeTabIds(initialTree)
+    for (const [tabId, meta] of Object.entries(initialMetadata)) {
+      if (!initialTree || tabIds.has(tabId)) {
+        values.set(tabId, meta)
       }
     }
   }

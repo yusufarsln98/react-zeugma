@@ -3,7 +3,6 @@ import { useDraggable, useDroppable } from '@dnd-kit/core'
 import {
   useZeugmaState,
   ZeugmaActionsContext,
-  ZeugmaMetadataContext,
   useZeugmaDrag,
   PortalRegistryContext,
 } from '../../../shared'
@@ -114,9 +113,7 @@ export const Tab: React.FC<TabProps> = ({ id, locked = false, children, classNam
   const separator = showSeparator ? <div className={classNames.tabSeparator} /> : null
 
   const isActive = tabsContext ? tabsContext.activeTabId === id : false
-  const metadataContext = useContext(ZeugmaMetadataContext)
-  const liveMetadata = useTabMetadata(id)
-  const metadata = metadataContext ? liveMetadata : tabsContext?.tabsMetadata?.[id]
+  const metadata = useTabMetadata(id)
 
   const selectThisTab = useCallback(() => {
     tabsContext?.selectTab(id)
