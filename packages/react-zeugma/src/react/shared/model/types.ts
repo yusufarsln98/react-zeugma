@@ -116,6 +116,11 @@ export interface BaseZeugmaProps {
   }) => ReactNode
   /** [Experimental] Optional custom renderer for the placeholder shown in a pane when its active tab is popped out into a new window. */
   renderPopoutPlaceholder?: (props: PopoutPlaceholderProps) => ReactNode
+  /** [Experimental] Same-origin URL to open for popout windows (defaults to '/popout.html').
+   * Pass '' to open about:blank instead. Using a same-origin URL ensures widgets inside popouts
+   * receive an HTTP Referer header (e.g. for OpenStreetMap tiles).
+   */
+  popoutUrl?: string | ((tabId: string) => string)
 }
 
 export type ZeugmaProps =
@@ -177,6 +182,11 @@ export interface ZeugmaStateValue extends ZeugmaState, ZeugmaQueries {
   }) => ReactNode
   /** [Experimental] Optional custom renderer for the placeholder shown in a pane when its active tab is popped out into a new window. */
   renderPopoutPlaceholder?: (props: PopoutPlaceholderProps) => ReactNode
+  /** [Experimental] Same-origin URL to open for popout windows (defaults to '/popout.html').
+   * Pass '' to open about:blank instead. Using a same-origin URL ensures widgets inside popouts
+   * receive an HTTP Referer header (e.g. for OpenStreetMap tiles).
+   */
+  popoutUrl?: string | ((tabId: string) => string)
 }
 
 export interface ZeugmaDragStateValue {

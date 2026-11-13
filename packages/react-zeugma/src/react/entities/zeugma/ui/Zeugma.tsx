@@ -74,6 +74,7 @@ const ZeugmaProviderInternal: React.FC<
 
     renderPopoutWrapper,
     renderPopoutPlaceholder,
+    popoutUrl,
   } = props
 
   const internalController = controller as ZeugmaControllerInternal
@@ -134,6 +135,7 @@ const ZeugmaProviderInternal: React.FC<
     registerPopoutTarget,
     findTabById,
     dockTab,
+    popoutUrl,
   })
 
   const isTabPoppedOut = useCallback(
