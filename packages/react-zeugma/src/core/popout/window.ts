@@ -6,13 +6,19 @@ export const delayClose = (closeFn: () => void) => {
   }
 }
 
-export function openPopoutWindow(tabId: string, title: string): Window | null {
+export function openPopoutWindow(
+  tabId: string,
+  title: string,
+  url = '/popout.html',
+): Window | null {
   if (typeof window === 'undefined') return null
-  const popup = window.open('', `zeugma-popout-${tabId}`, 'width=800,height=600')
+  const popup = window.open(url, `zeugma-popout-${tabId}`, 'width=800,height=600')
   if (!popup) return null
 
-  popup.document.title = title
-  popup.document.head.innerHTML = ''
+  if (!url) {
+    popup.document.head.innerHTML = ''
+    popup.document.title = title
+  }
   return popup
 }
 

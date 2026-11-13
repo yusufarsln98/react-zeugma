@@ -1,5 +1,11 @@
 # react-zeugma
 
+## 8.1.1
+
+### Patch Changes
+
+- Fix bottom root drop zone positioning in `RootDropZones` where `top` was being applied to all horizontal edges, overriding `bottom: offset` when `edge === 'bottom'`.
+
 ## 8.1.0
 
 ### Minor Changes

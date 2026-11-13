@@ -23,6 +23,20 @@ let originalCreateElement: typeof document.createElement | null = null
 let originalGetElementById: typeof document.getElementById | null = null
 let originalQuerySelector: typeof document.querySelector | null = null
 let originalQuerySelectorAll: typeof document.querySelectorAll | null = null
+let originalDocAddEventListener: typeof document.addEventListener | null = null
+let originalDocRemoveEventListener: typeof document.removeEventListener | null = null
+let originalWinAddEventListener: typeof window.addEventListener | null = null
+let originalWinRemoveEventListener: typeof window.removeEventListener | null = null
+
+interface TrackedListener {
+  target: EventTarget
+  type: string
+  listener: EventListenerOrEventListenerObject
+  capture: boolean
+}
+
+const docTrackedListeners: TrackedListener[] = []
+const winTrackedListeners: TrackedListener[] = []
 
 const DOC_PROPERTIES = [
   'body',
@@ -77,8 +91,82 @@ export function addActivePopoutDocument(doc: Document): void {
   activePopoutDocuments.add(doc)
 }
 
+function getCaptureFlag(
+  options?: boolean | AddEventListenerOptions | EventListenerOptions,
+): boolean {
+  return typeof options === 'boolean' ? options : Boolean(options?.capture)
+}
+
+function pruneTrackedListeners(list: TrackedListener[], target: EventTarget): void {
+  for (let i = list.length - 1; i >= 0; i--) {
+    if (list[i].target === target) {
+      list.splice(i, 1)
+    }
+  }
+}
+
+function createInterceptedEventMethods<T extends EventTarget>(
+  baseTarget: T,
+  originalAdd: T['addEventListener'],
+  originalRemove: T['removeEventListener'],
+  trackedListeners: TrackedListener[],
+  resolveActiveTarget: (activeDoc: Document) => EventTarget | null,
+) {
+  const add = function (
+    this: T,
+    type: string,
+    listener: EventListenerOrEventListenerObject | null,
+    options?: boolean | AddEventListenerOptions,
+  ) {
+    const activeDoc = getActiveDocument()
+    if (listener && activeDoc && activeDoc !== document) {
+      const target = resolveActiveTarget(activeDoc)
+      if (target) {
+        const capture = getCaptureFlag(options)
+        const exists = trackedListeners.some(
+          (entry) =>
+            entry.target === target &&
+            entry.type === type &&
+            entry.listener === listener &&
+            entry.capture === capture,
+        )
+        if (!exists) {
+          trackedListeners.push({ target, type, listener, capture })
+        }
+        return target.addEventListener(type, listener, options)
+      }
+    }
+    return originalAdd.call(baseTarget, type, listener, options)
+  }
+
+  const remove = function (
+    this: T,
+    type: string,
+    listener: EventListenerOrEventListenerObject | null,
+    options?: boolean | EventListenerOptions,
+  ) {
+    if (listener) {
+      const capture = getCaptureFlag(options)
+      for (let i = trackedListeners.length - 1; i >= 0; i--) {
+        const entry = trackedListeners[i]
+        if (entry.type === type && entry.listener === listener && entry.capture === capture) {
+          entry.target.removeEventListener(type, listener, options)
+          trackedListeners.splice(i, 1)
+        }
+      }
+    }
+    return originalRemove.call(baseTarget, type, listener, options)
+  }
+
+  return { add, remove }
+}
+
 export function removeActivePopoutDocument(doc: Document): void {
   activePopoutDocuments.delete(doc)
+  pruneTrackedListeners(docTrackedListeners, doc)
+  if (doc.defaultView) {
+    pruneTrackedListeners(winTrackedListeners, doc.defaultView)
+  }
 }
 
 export function isPopoutInterceptionActive(): boolean {
@@ -405,11 +493,57 @@ export function setupPopoutInterception(): void {
     }
     return mainResults
   }
+
+  // Intercept document and window event listener registration so drag/pan/interaction
+  // listeners added during popout events bind to (and later unbind from) the popout target.
+  originalDocAddEventListener = document.addEventListener
+  originalDocRemoveEventListener = document.removeEventListener
+  const docEventMethods = createInterceptedEventMethods(
+    document,
+    originalDocAddEventListener,
+    originalDocRemoveEventListener,
+    docTrackedListeners,
+    (activeDoc) => activeDoc,
+  )
+  document.addEventListener = docEventMethods.add as typeof document.addEventListener
+  document.removeEventListener = docEventMethods.remove as typeof document.removeEventListener
+
+  originalWinAddEventListener = window.addEventListener
+  originalWinRemoveEventListener = window.removeEventListener
+  const winEventMethods = createInterceptedEventMethods(
+    window,
+    originalWinAddEventListener,
+    originalWinRemoveEventListener,
+    winTrackedListeners,
+    (activeDoc) => activeDoc.defaultView,
+  )
+  window.addEventListener = winEventMethods.add as typeof window.addEventListener
+  window.removeEventListener = winEventMethods.remove as typeof window.removeEventListener
 }
 
 export function teardownPopoutInterception(): void {
   if (typeof window === 'undefined' || !interceptionInitialized) return
   interceptionInitialized = false
+
+  // Restore document and window event listener methods
+  if (originalDocAddEventListener) {
+    document.addEventListener = originalDocAddEventListener
+    originalDocAddEventListener = null
+  }
+  if (originalDocRemoveEventListener) {
+    document.removeEventListener = originalDocRemoveEventListener
+    originalDocRemoveEventListener = null
+  }
+  if (originalWinAddEventListener) {
+    window.addEventListener = originalWinAddEventListener
+    originalWinAddEventListener = null
+  }
+  if (originalWinRemoveEventListener) {
+    window.removeEventListener = originalWinRemoveEventListener
+    originalWinRemoveEventListener = null
+  }
+  docTrackedListeners.length = 0
+  winTrackedListeners.length = 0
 
   // Restore Symbol.hasInstance on all constructors
   originalHasInstances.forEach((desc, target) => {
