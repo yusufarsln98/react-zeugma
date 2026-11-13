@@ -744,4 +744,131 @@ describe('useZeugma Hook', () => {
     expect(result.current.getTabMetadata('tab-1')).toEqual({ title: 'V2' })
     expect(result.current.getTabMetadata('non-existent')).toBeUndefined()
   })
+
+  it('should expose setMetadata and preserve surviving metadata across setLayout', () => {
+    const onMetadataChange = vi.fn()
+    const onMetadataMapChange = vi.fn()
+    const cleanLayout: PaneNode = {
+      type: 'pane',
+      id: 'pane-1',
+      tabIds: ['tab-1', 'tab-2'],
+      activeTabId: 'tab-1',
+    }
+    const { result } = renderHook(() =>
+      useZeugma({
+        initialLayout: cleanLayout,
+        initialMetadata: {
+          'tab-1': { title: 'One' },
+          'tab-2': { title: 'Two' },
+        },
+        onMetadataChange,
+        onMetadataMapChange,
+      }),
+    )
+
+    // setLayout without metadata preserves surviving tabs and prunes removed tabs
+    act(() => {
+      result.current.setLayout({
+        type: 'pane',
+        id: 'pane-1',
+        tabIds: ['tab-1'],
+        activeTabId: 'tab-1',
+      })
+    })
+    expect(result.current.getMetadataMap()).toEqual({ 'tab-1': { title: 'One' } })
+
+    // setMetadata updates metadata map and filters orphan keys not in layout
+    act(() => {
+      result.current.setMetadata({
+        'tab-1': { title: 'One Updated' },
+        ghost: { title: 'Ignored' },
+      })
+    })
+    expect(result.current.getMetadataMap()).toEqual({ 'tab-1': { title: 'One Updated' } })
+    expect(onMetadataChange).toHaveBeenCalledWith('tab-1', { title: 'One Updated' })
+    expect(onMetadataMapChange).toHaveBeenLastCalledWith({ 'tab-1': { title: 'One Updated' } })
+
+    // setLayout followed by setMetadata replaces both layout and metadata
+    act(() => {
+      result.current.setLayout({
+        type: 'pane',
+        id: 'pane-2',
+        tabIds: ['tab-3'],
+        activeTabId: 'tab-3',
+      })
+      result.current.setMetadata({
+        'tab-3': { title: 'Three' },
+        orphan: { title: 'Ignored' },
+      })
+    })
+    expect(result.current.layout).toMatchObject({ id: 'pane-2', tabIds: ['tab-3'] })
+    expect(result.current.getMetadataMap()).toEqual({ 'tab-3': { title: 'Three' } })
+  })
+
+  it('should support silent hydrate(layout, metadata) without firing onChange callbacks', () => {
+    const onChange = vi.fn()
+    const onMetadataChange = vi.fn()
+    const onMetadataMapChange = vi.fn()
+    const { result } = renderHook(() =>
+      useZeugma({
+        initialLayout,
+        initialMetadata: { 'tab-1': { title: 'Initial' } },
+        onChange,
+        onMetadataChange,
+        onMetadataMapChange,
+      }),
+    )
+
+    act(() => {
+      result.current.hydrate(
+        {
+          type: 'pane',
+          id: 'pane-hydrated',
+          tabIds: ['tab-a', 'tab-b'],
+          activeTabId: 'tab-a',
+        },
+        {
+          'tab-a': { title: 'Hydrated A' },
+          orphan: { title: 'Ignored' },
+        },
+      )
+    })
+
+    expect(result.current.layout).toMatchObject({ id: 'pane-hydrated', tabIds: ['tab-a', 'tab-b'] })
+    expect(result.current.getMetadataMap()).toEqual({ 'tab-a': { title: 'Hydrated A' } })
+    expect(onChange).not.toHaveBeenCalled()
+    expect(onMetadataChange).not.toHaveBeenCalled()
+    expect(onMetadataMapChange).not.toHaveBeenCalled()
+  })
+
+  it('should move an existing tab into a new split pane with splitTab while preserving metadata', () => {
+    const { result } = renderHook(() =>
+      useZeugma({
+        initialLayout: {
+          type: 'pane',
+          id: 'pane-1',
+          tabIds: ['tab-1', 'tab-2'],
+          activeTabId: 'tab-1',
+        },
+        initialMetadata: {
+          'tab-1': { title: 'First' },
+          'tab-2': { title: 'Second' },
+        },
+      }),
+    )
+
+    act(() => {
+      result.current.splitTab('tab-2', 'pane-1', 'row', 'right')
+    })
+
+    const root = result.current.layout as SplitNode
+    expect(root.type).toBe('split')
+    expect(root.direction).toBe('row')
+    expect((root.first as PaneNode).tabIds).toEqual(['tab-1'])
+    expect((root.second as PaneNode).tabIds).toEqual(['tab-2'])
+    expect(result.current.getMetadataMap()).toEqual({
+      'tab-1': { title: 'First' },
+      'tab-2': { title: 'Second' },
+    })
+  })
 })

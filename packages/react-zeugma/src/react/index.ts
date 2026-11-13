@@ -20,6 +20,7 @@ export type {
   SplitDirection,
   DragOverlayActiveItem,
   MetadataUpdater,
+  TabMetadataMap,
 } from './shared'
 export { useZeugma, useZeugmaContext, useTabMetadata } from './entities/zeugma'
 export { useResizer } from './features/resize-pane'

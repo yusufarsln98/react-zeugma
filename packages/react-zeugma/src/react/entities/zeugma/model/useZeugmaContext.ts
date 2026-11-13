@@ -9,6 +9,8 @@ export const useZeugmaContext = (): ZeugmaController => {
     () => ({
       layout: state.layout,
       setLayout: state.setLayout,
+      setMetadata: actions.setMetadata,
+      hydrate: actions.hydrate,
       fullscreenPaneId: state.fullscreenPaneId,
       setFullscreenPaneId: actions.setFullscreenPaneId,
       locked: state.locked,
@@ -21,6 +23,7 @@ export const useZeugmaContext = (): ZeugmaController => {
       mergeTab: actions.mergeTab,
       removeTab: actions.removeTab,
       splitPane: actions.splitPane,
+      splitTab: actions.splitTab,
       updateSplitPercentage: actions.updateSplitPercentage,
       moveTab: actions.moveTab,
       findPaneById: state.findPaneById,
