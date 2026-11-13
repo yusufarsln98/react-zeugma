@@ -14,8 +14,6 @@ describe('Public API Runtime Exports Snapshot', () => {
       'findPaneContainingTab',
       'findTabById',
       'generateUniqueId',
-      'getActiveTabMetadata',
-      'getTabMetadata',
       'insertLeaf',
       'isValidTreeNode',
       'mergeTab',

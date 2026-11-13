@@ -16,7 +16,7 @@ description: Rules, types, component composition, and programmatic manipulation 
 - **renderPane Placement Rule**: If using `<Zeugma>` with `children` (Context Provider Mode), you MUST pass the `renderPane` prop directly to `<PaneTree renderPane={renderPane} />`, and `renderPane` is forbidden on `<Zeugma>`. If using `<Zeugma>` in standalone mode (without `children`), you MUST pass `renderPane` directly to `<Zeugma renderPane={renderPane} />`.
 - **DragHandle Placement**: Draggable panes require a child `<Pane.DragHandle>` component to define the interactive drag region.
 - **Stable Layout During Drag Rule**: The logical `layout` object from the controller or context does not update in real-time during a drag session. It only updates once the drop action is committed. The active visual removals and split previews are managed by the library's internal rendering layout.
-- **Fine-Grained Mutable Tab Metadata**: Tab metadata is decoupled from the layout topology (`TreeNode`) via an external per-tab store (`useSyncExternalStore`). Metadata can be initialized in `initialLayout` or `addTab(tabId, targetPaneId?, metadata?)`, updated without layout/widget re-renders via `updateTabMetadata(tabId, updater)`, and read via `findTabById(tabId)?.metadata`, `getTabMetadata(tabId)`, or `useTabMetadata(tabId)`.
+- **Fine-Grained Mutable Tab Metadata**: Tab metadata is completely decoupled from the layout topology (`TreeNode`) via an external per-tab store (`useSyncExternalStore`) keyed by tab ID (`TabMetadataMap`). Metadata can be initialized via `useZeugma({ initialMetadata })` or `addTab(tabId, targetPaneId?, metadata?)`, controlled via `metadata` / `onMetadataMapChange`, updated without layout/widget re-renders via `updateTabMetadata(tabId, updater)`, and read via `findTabById(tabId)?.metadata`, `getTabMetadata(tabId)`, `getMetadataMap()`, or `useTabMetadata(tabId)`. Removed tabs/panes are automatically pruned from the metadata store to stay consistent with the layout tree.
 
 ---
 
@@ -41,17 +41,18 @@ export interface PaneNode {
   tabIds: string[]
   activeTabId: string
   locked?: boolean
-  tabsMetadata?: Record<string, Record<string, unknown>>
 }
 
 export type TreeNode = SplitNode | PaneNode
+
+export type TabMetadataMap = Record<string, Record<string, unknown>>
 
 export interface TabDetails {
   id: string
   paneId: string
   isActive: boolean
   index: number
-  metadata: Record<string, unknown> | undefined
+  metadata?: Record<string, unknown>
 }
 ```
 
@@ -151,6 +152,7 @@ const {
   findTabById,
   getTabMetadata,
   getActiveTabMetadata,
+  getMetadataMap,
   poppedOutTabIds,
   popoutTab,
   dockTab,
@@ -174,7 +176,6 @@ const {
   removeTab,
   metadata,
   locked,
-  tabsMetadata,
   isActiveTabPoppedOut,
   popoutTab,
   dockTab,

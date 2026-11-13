@@ -84,15 +84,17 @@ describe('Zeugma Context Provider & Consumers', () => {
       id: 'pane-1',
       tabIds: ['tab-1'],
       activeTabId: 'tab-1',
-      tabsMetadata: {
-        'tab-1': { title: 'My Tab Title', customProp: 42 },
-      },
     }
 
     let receivedMetadata: Record<string, unknown> | undefined = undefined
 
     const TestWrapper = () => {
-      const controller = useZeugma({ initialLayout })
+      const controller = useZeugma({
+        initialLayout,
+        initialMetadata: {
+          'tab-1': { title: 'My Tab Title', customProp: 42 },
+        },
+      })
       const renderPane = (paneId: string) => (
         <Pane id={paneId}>
           <div data-testid="pane-root">
@@ -196,6 +198,7 @@ describe('Tab Drop Preview rendering', () => {
     findTabById: () => null,
     getTabMetadata: () => undefined,
     getActiveTabMetadata: () => undefined,
+    getMetadataMap: () => ({}),
     renderPane: () => null,
     poppedOutTabIds: [] as string[],
     isTabPoppedOut: () => false,
@@ -451,10 +454,6 @@ describe('Tab Drop Preview rendering', () => {
         id: 'pane-1',
         tabIds: ['tab-1', 'tab-2'],
         activeTabId: 'tab-1',
-        tabsMetadata: {
-          'tab-1': { title: 'Tab 1', badge: 0 },
-          'tab-2': { title: 'Tab 2' },
-        },
       }
 
       const renderCounts = {
@@ -506,7 +505,13 @@ describe('Tab Drop Preview rendering', () => {
       let controllerInstance: ZeugmaController | null = null
 
       const TestWrapper = () => {
-        const controller = useZeugma({ initialLayout })
+        const controller = useZeugma({
+          initialLayout,
+          initialMetadata: {
+            'tab-1': { title: 'Tab 1', badge: 0 },
+            'tab-2': { title: 'Tab 2' },
+          },
+        })
         controllerInstance = controller
         return <Zeugma controller={controller} renderPane={(id) => <PaneBody id={id} />} />
       }

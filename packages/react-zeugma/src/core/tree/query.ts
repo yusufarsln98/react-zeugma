@@ -41,28 +41,5 @@ export function findTabById(tree: TreeNode | null, tabId: string): TabDetails | 
     paneId: pane.id,
     isActive: pane.activeTabId === tabId,
     index,
-    metadata: pane.tabsMetadata?.[tabId],
   }
-}
-
-/**
- * Get the metadata for a specific tab by its ID.
- */
-export function getTabMetadata(
-  tree: TreeNode | null,
-  tabId: string,
-): Record<string, unknown> | undefined {
-  const pane = findPaneContainingTab(tree, tabId)
-  return pane?.tabsMetadata?.[tabId]
-}
-
-/**
- * Get the metadata of the active tab in a specific pane.
- */
-export function getActiveTabMetadata(
-  tree: TreeNode | null,
-  paneId: string,
-): Record<string, unknown> | undefined {
-  const pane = findPaneById(tree, paneId)
-  return pane?.tabsMetadata?.[pane.activeTabId]
 }

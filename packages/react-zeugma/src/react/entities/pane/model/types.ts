@@ -23,8 +23,6 @@ export interface PaneRenderProps extends BaseLeafRenderProps {
   selectTab: (tabId: string) => void
   /** Removes/closes a specific tab. */
   removeTab: (tabId: string) => void
-  /** The metadata values associated with all tabs in this pane. */
-  tabsMetadata: Record<string, Record<string, unknown>> | undefined
   /** Whether the active tab is popped out into a new window. */
   isActiveTabPoppedOut: boolean
   /** Popout the active tab (or a specific tab) into a new window. */

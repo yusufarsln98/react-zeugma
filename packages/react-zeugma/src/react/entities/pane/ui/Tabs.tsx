@@ -14,7 +14,6 @@ export interface TabsContextValue {
   tabIds: string[]
   activeTabId: string
   locked: boolean
-  tabsMetadata?: Record<string, Record<string, unknown>>
   selectTab: (id: string) => void
   removeTab: (id: string) => void
 }
@@ -36,8 +35,6 @@ export interface TabsProps {
   activeTabId?: string
   /** Whether dragging is locked on these tabs. */
   locked?: boolean
-  /** Metadata for the tabs. */
-  tabsMetadata?: Record<string, Record<string, unknown>>
   /** Callback when a tab is selected. */
   selectTab?: (id: string) => void
   /** Callback when a tab is closed/removed. */
@@ -79,7 +76,6 @@ export const Tabs: React.FC<TabsProps> & {
   tabIds: propTabs,
   activeTabId: propActiveTabId,
   locked: propLocked,
-  tabsMetadata: propTabsMetadata,
   selectTab: propSelectTab,
   removeTab: propRemoveTab,
   renderTab,
@@ -94,7 +90,6 @@ export const Tabs: React.FC<TabsProps> & {
   )
   const activeTabId = propActiveTabId ?? paneContext?.activeTabId ?? ''
   const locked = propLocked ?? paneContext?.locked ?? false
-  const tabsMetadata = propTabsMetadata ?? paneContext?.tabsMetadata
   const selectTab = useMemo(
     () => propSelectTab ?? paneContext?.selectTab ?? NOOP,
     [propSelectTab, paneContext?.selectTab],
@@ -117,11 +112,10 @@ export const Tabs: React.FC<TabsProps> & {
       tabIds,
       activeTabId,
       locked,
-      tabsMetadata,
       selectTab,
       removeTab,
     }),
-    [tabIds, activeTabId, locked, tabsMetadata, selectTab, removeTab],
+    [tabIds, activeTabId, locked, selectTab, removeTab],
   )
 
   const targetIndex = calculateTabDropIndex(tabIds, activeType, overTabId, overTabPosition)

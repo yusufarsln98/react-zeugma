@@ -9,7 +9,7 @@ import {
   lockedDropId,
   PopoutPlaceholderProps,
 } from '../../../shared'
-import { findPaneOrContainingTab, findPaneContainingTab } from '../../../../core/tree'
+import { findPaneOrContainingTab } from '../../../../core/tree'
 import { DragListenersCtx } from '../model/context'
 import { PaneRenderProps } from '../model/types'
 import { DropZone } from './DropZone'
@@ -152,19 +152,17 @@ export const Pane: React.FC<PaneProps> & {
     onFullscreenChange,
     locked: globalLocked,
     poppedOutTabIds = [],
+    getTabMetadata,
   } = useZeugmaState()
   const { removePane, selectTab, removeTab, popoutTab, dockTab } = useZeugmaActions()
 
   const paneNode = useMemo(() => {
     if (activeType === 'tab' && id === activeId) {
-      const originalPane = findPaneContainingTab(layout, id)
-      const sourceMetadata = originalPane?.tabsMetadata?.[id]
       return {
         type: 'pane' as const,
         id,
         tabIds: [id],
         activeTabId: id,
-        tabsMetadata: sourceMetadata ? { [id]: sourceMetadata } : undefined,
       }
     }
     const targetTree = id === activeId ? layout : renderingLayout
@@ -173,9 +171,8 @@ export const Pane: React.FC<PaneProps> & {
   const paneContainerId = paneNode?.id ?? id
   const tabIds = useMemo(() => paneNode?.tabIds ?? [id], [paneNode?.tabIds, id])
   const activeTabId = paneNode?.activeTabId ?? id
-  const tabsMetadata = paneNode?.tabsMetadata
 
-  const metadata = tabsMetadata?.[id]
+  const metadata = getTabMetadata?.(id)
   const localLocked = paneNode?.locked ?? false
 
   const isPaneLocked = propLocked || localLocked
@@ -219,7 +216,6 @@ export const Pane: React.FC<PaneProps> & {
         }
         removeTab(tabId)
       },
-      tabsMetadata,
       isActiveTabPoppedOut: poppedOutTabIds.includes(activeTabId),
       popoutTab: (tabId) => popoutTab(tabId || activeTabId),
       dockTab: (tabId) => dockTab(tabId || activeTabId),
@@ -237,7 +233,6 @@ export const Pane: React.FC<PaneProps> & {
       activeTabId,
       selectTab,
       removeTab,
-      tabsMetadata,
       poppedOutTabIds,
       popoutTab,
       dockTab,

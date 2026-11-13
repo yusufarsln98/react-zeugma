@@ -39,12 +39,7 @@ export function isRenderableTree(node: unknown): node is TreeNode {
   if (!isValidTreeNode(node)) return false
 
   if (node.type === 'pane') {
-    return (
-      node.tabIds.length > 0 &&
-      node.tabIds.includes(node.activeTabId) &&
-      (node.tabsMetadata === undefined ||
-        (typeof node.tabsMetadata === 'object' && node.tabsMetadata !== null))
-    )
+    return node.tabIds.length > 0 && node.tabIds.includes(node.activeTabId)
   }
 
   if (node.type === 'split') {
