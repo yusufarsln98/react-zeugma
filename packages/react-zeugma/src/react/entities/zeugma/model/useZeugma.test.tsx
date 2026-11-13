@@ -221,6 +221,55 @@ describe('useZeugma Hook', () => {
     expect(result.current.getTabMetadata('tab-2')).toEqual({ title: 'Tab 2 Title' })
   })
 
+  it('should update tab metadata without changing layout reference and fire onMetadataChange', () => {
+    const layoutWithMeta: PaneNode = {
+      type: 'pane',
+      id: 'pane-1',
+      tabIds: ['tab-1'],
+      activeTabId: 'tab-1',
+      tabsMetadata: {
+        'tab-1': { title: 'Initial', count: 1 },
+      },
+    }
+    const onChange = vi.fn()
+    const onMetadataChange = vi.fn()
+    const { result } = renderHook(() =>
+      useZeugma({ initialLayout: layoutWithMeta, onChange, onMetadataChange }),
+    )
+
+    const initialLayoutRef = result.current.layout
+
+    // Partial object merge
+    act(() => {
+      result.current.updateTabMetadata('tab-1', { count: 2 })
+    })
+
+    expect(result.current.layout).toBe(initialLayoutRef)
+    expect(onChange).not.toHaveBeenCalled()
+    expect(result.current.getTabMetadata('tab-1')).toEqual({ title: 'Initial', count: 2 })
+    expect(result.current.getActiveTabMetadata('pane-1')).toEqual({ title: 'Initial', count: 2 })
+    expect(onMetadataChange).toHaveBeenCalledWith('tab-1', { title: 'Initial', count: 2 })
+
+    // Updater function
+    act(() => {
+      result.current.updateTabMetadata('tab-1', (prev) => ({ ...prev, dirty: true }))
+    })
+
+    expect(result.current.layout).toBe(initialLayoutRef)
+    expect(result.current.getTabMetadata('tab-1')).toEqual({
+      title: 'Initial',
+      count: 2,
+      dirty: true,
+    })
+
+    // Removing the tab cleans up its metadata
+    act(() => {
+      result.current.removeTab('tab-1')
+    })
+
+    expect(result.current.getTabMetadata('tab-1')).toBeUndefined()
+  })
+
   it('should lock and unlock a specific pane programmatically', () => {
     const { result } = renderHook(() => useZeugma({ initialLayout }))
 

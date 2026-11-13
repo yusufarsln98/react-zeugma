@@ -136,7 +136,6 @@ export const Tabs: React.FC<TabsProps> & {
         }}
       >
         {tabIds.map((tabId, index) => {
-          const metadata = tabsMetadata?.[tabId]
           const resolvedClassName = resolveDynamicProp(classNames?.tab, tabId)
           const resolvedStyle = resolveDynamicProp(styles?.tab, tabId)
 
@@ -158,7 +157,7 @@ export const Tabs: React.FC<TabsProps> & {
                 </div>
               )}
               <Tab id={tabId} locked={locked} className={resolvedClassName} style={resolvedStyle}>
-                {({ isDragging, isOver }) =>
+                {({ isDragging, isOver, metadata }) =>
                   renderTab({
                     id: tabId,
                     paneId: paneContext?.id ?? '',

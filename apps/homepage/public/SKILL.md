@@ -16,7 +16,7 @@ description: Rules, types, component composition, and programmatic manipulation 
 - **renderPane Placement Rule**: If using `<Zeugma>` with `children` (Context Provider Mode), you MUST pass the `renderPane` prop directly to `<PaneTree renderPane={renderPane} />`, and `renderPane` is forbidden on `<Zeugma>`. If using `<Zeugma>` in standalone mode (without `children`), you MUST pass `renderPane` directly to `<Zeugma renderPane={renderPane} />`.
 - **DragHandle Placement**: Draggable panes require a child `<Pane.DragHandle>` component to define the interactive drag region.
 - **Stable Layout During Drag Rule**: The logical `layout` object from the controller or context does not update in real-time during a drag session. It only updates once the drop action is committed. The active visual removals and split previews are managed by the library's internal rendering layout.
-- **Immutable Tab Metadata**: Tab metadata is decoupled from the layout topology (`TreeNode`). Metadata is registered at tab creation (`initialMetadata`, `addTab(tabId, targetPaneId?, metadata?)`) and read via `findTabById(tabId)?.metadata`, `getTabMetadata(tabId)`, or `useTabMetadata(tabId)`. No imperative `updateMetadata` mutations exist.
+- **Fine-Grained Mutable Tab Metadata**: Tab metadata is decoupled from the layout topology (`TreeNode`) via an external per-tab store (`useSyncExternalStore`). Metadata can be initialized in `initialLayout` or `addTab(tabId, targetPaneId?, metadata?)`, updated without layout/widget re-renders via `updateTabMetadata(tabId, updater)`, and read via `findTabById(tabId)?.metadata`, `getTabMetadata(tabId)`, or `useTabMetadata(tabId)`.
 
 ---
 
@@ -115,9 +115,6 @@ function Dashboard() {
 ### `<Zeugma>` Component Props
 
 - `controller`: The layout state controller returned by `useZeugma(options)`.
-- `persist?: boolean | ZeugmaPersistOptions`: Layout persistence configuration in localStorage.
-  - `enabled?: boolean`: Whether layout persistence is enabled (defaults to true).
-  - `key?: string`: The localStorage key (defaults to `'zeugma-layout'`).
 - `renderPopoutWrapper?: (props: { tabId: string; document: Document; window: Window; children: React.ReactNode }) => React.ReactNode`: [Experimental] Optional custom wrapper to inject style managers or providers into popout windows.
 - `renderPopoutPlaceholder?: (props: { tabId: string; dock: () => void }) => React.ReactNode`: [Experimental] Optional custom renderer for the placeholder shown in a pane when its active tab is popped out into a separate window.
 
@@ -128,6 +125,7 @@ Instantiates the dashboard state engine.
 - `initialLayout?: TreeNode | null` (Initial uncontrolled tree)
 - `layout?: TreeNode | null` (Controlled layout tree)
 - `onChange?: (newLayout: TreeNode | null) => void` (Layout updates handler)
+- `onMetadataChange?: (tabId: string, metadata: Record<string, unknown> | undefined) => void` (Metadata updates handler)
 - `locked?: boolean` (Disable all resize/drag-and-drop operations)
 - `fullscreenPaneId?: string | null` (Maximize target pane ID. When active, structural layout changes are blocked)
 - `onFullscreenChange?: (paneId: string | null) => void` (Maximize toggle handler)
@@ -144,6 +142,7 @@ const {
   setLayout,
   removePane,
   addTab,
+  updateTabMetadata,
   selectTab,
   splitPane,
   updatePaneLock,

@@ -1,5 +1,18 @@
 # react-zeugma
 
+## 8.1.0
+
+### Minor Changes
+
+- **Fine-Grained Mutable Tab Metadata**:
+  - Decoupled live tab metadata into a per-tab external store (`useSyncExternalStore`) so metadata updates never trigger layout tree, `Pane`, `Tabs`, sibling `Tab`, or widget (`PortalHostItem`) re-renders.
+  - Added `updateTabMetadata(tabId, updater)` to `ZeugmaActions` / `useZeugma` / `useZeugmaContext` (supporting partial object merges and updater functions).
+  - Exported `useTabMetadata(tabId)` from `react-zeugma/react` and `MetadataUpdater` from `react-zeugma` for fine-grained reactive subscriptions.
+  - Added optional `onMetadataChange?: (tabId, metadata) => void` to `UseZeugmaOptions`.
+  - Preserved live metadata across drag-and-drop moves and splits via internal `_commitDndLayout`.
+- **Remove Built-in `localStorage` Persistence**:
+  - Removed the `persist` prop on `<Zeugma>`, `useZeugmaPersistence`, `ZeugmaPersistOptions`, and `DEFAULT_PERSIST_KEY` from the library API; persistence can be implemented directly in client code using `useZeugma` (`controller.layout` and `controller.setLayout`).
+
 ## 8.0.0
 
 ### Major Changes
@@ -9,17 +22,12 @@
   - **Root & Core Entrypoints (`react-zeugma` / `react-zeugma/core`)**: Now export pure, zero-React layout tree mutators, queries, layout bounding-box calculations (`computeLayout`), and core types without a `"use client"` directive. Removed the separate `react-zeugma/utils` subpath in favor of the root/core entry.
   - **React Subpath (`react-zeugma/react`)**: Moved all React components (`<Zeugma>`, `<PaneTree>`, `<Pane>`), hooks (`useZeugma`, `useZeugmaContext`, `usePaneContext`, `useResizer`), contexts, portals, and `@dnd-kit/core` integration to `react-zeugma/react`.
   - Marked `react` and `react-dom` peer dependencies as optional in `peerDependenciesMeta` so non-React consumers can install and use the core engine standalone.
-
-## 7.2.0
-
-### Minor Changes
-
-- 3685354: Make popout placeholder in `Pane.Content` style-agnostic and headless:
-
-  - Remove hardcoded default values, container styling (`#161719`), blue button (`#2563eb`), hover events, and static copy from `Pane.Content`.
-  - Add `renderPopoutPlaceholder` prop to `Pane.Content` and `Zeugma` to allow custom placeholder rendering with `{ tabId, dock }`.
-  - Add `popoutPlaceholder` class name to `ZeugmaClassNames`.
-  - Export `PopoutPlaceholderProps` and `PaneContentProps` from `react-zeugma`.
+- **Headless Popout Placeholder**:
+  - Make popout placeholder in `Pane.Content` style-agnostic and headless:
+    - Remove hardcoded default values, container styling (`#161719`), blue button (`#2563eb`), hover events, and static copy from `Pane.Content`.
+    - Add `renderPopoutPlaceholder` prop to `Pane.Content` and `Zeugma` to allow custom placeholder rendering with `{ tabId, dock }`.
+    - Add `popoutPlaceholder` class name to `ZeugmaClassNames`.
+    - Export `PopoutPlaceholderProps` and `PaneContentProps` from `react-zeugma/react`.
 
 ## 7.1.2
 

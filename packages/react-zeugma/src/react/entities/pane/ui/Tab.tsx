@@ -3,10 +3,12 @@ import { useDraggable, useDroppable } from '@dnd-kit/core'
 import {
   useZeugmaState,
   ZeugmaActionsContext,
+  ZeugmaMetadataContext,
   useZeugmaDrag,
   PortalRegistryContext,
 } from '../../../shared'
 import { TabsContext } from './Tabs'
+import { useTabMetadata } from '../../zeugma/model/useTabMetadata'
 
 export interface TabContextValue {
   tabId: string
@@ -35,6 +37,7 @@ export const useTabContext = () => {
 export interface TabRenderProps {
   isDragging: boolean
   isOver: boolean
+  metadata?: Record<string, unknown>
 }
 
 export interface TabProps {
@@ -111,7 +114,9 @@ export const Tab: React.FC<TabProps> = ({ id, locked = false, children, classNam
   const separator = showSeparator ? <div className={classNames.tabSeparator} /> : null
 
   const isActive = tabsContext ? tabsContext.activeTabId === id : false
-  const metadata = tabsContext?.tabsMetadata?.[id]
+  const metadataContext = useContext(ZeugmaMetadataContext)
+  const liveMetadata = useTabMetadata(id)
+  const metadata = metadataContext ? liveMetadata : tabsContext?.tabsMetadata?.[id]
 
   const selectThisTab = useCallback(() => {
     tabsContext?.selectTab(id)
@@ -168,6 +173,7 @@ export const Tab: React.FC<TabProps> = ({ id, locked = false, children, classNam
         {children({
           isDragging,
           isOver: isTargetOver,
+          metadata,
         })}
       </div>
     </TabContext.Provider>

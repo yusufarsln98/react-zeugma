@@ -4,12 +4,16 @@ import {
   ZeugmaActionsValue,
   PortalRegistryValue,
   ZeugmaDragStateValue,
+  ZeugmaMetadataContextValue,
 } from '../model/types'
 
 export const ZeugmaStateContext = createContext<ZeugmaStateValue | undefined>(undefined)
 export const ZeugmaActionsContext = createContext<ZeugmaActionsValue | undefined>(undefined)
 export const PortalRegistryContext = createContext<PortalRegistryValue | undefined>(undefined)
 export const ZeugmaDragContext = createContext<ZeugmaDragStateValue | undefined>(undefined)
+export const ZeugmaMetadataContext = createContext<ZeugmaMetadataContextValue | undefined>(
+  undefined,
+)
 
 export const useZeugmaState = (): ZeugmaStateValue => {
   const state = useContext(ZeugmaStateContext)

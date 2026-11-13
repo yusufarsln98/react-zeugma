@@ -117,20 +117,8 @@ import { Zeugma } from 'react-zeugma'
 | `onResize`                | Callback triggered during pane resizing.                                                                                                                                                | `(currentNode: SplitNode, percentage: number) => void`                                                                                                                                           | -       |
 | `onResizeEnd`             | Callback triggered when pane resizing completes.                                                                                                                                        | `(currentNode: SplitNode, percentage: number) => void`                                                                                                                                           | -       |
 | `onDismissIntentChange`   | Callback triggered when drag-out dismiss intent changes.                                                                                                                                | `(paneId: string \| null) => void`                                                                                                                                                               | -       |
-| `persist`                 | Layout persistence configuration in localStorage. If true, uses default options.                                                                                                        | `boolean \| ZeugmaPersistOptions`                                                                                                                                                                | `false` |
 | `renderPopoutWrapper`     | **[Experimental]** Custom wrapper to inject context or style managers (e.g. `styled-components`' `StyleSheetManager` or `antd`'s `StyleProvider`/`ConfigProvider`) into popout windows. | `(props: { tabId: string; document: Document; window: Window; children: React.ReactNode }) => React.ReactNode`                                                                                   | -       |
 | `renderPopoutPlaceholder` | **[Experimental]** Custom renderer for the placeholder shown in a pane when its active tab is popped out into a new window.                                                             | `(props: PopoutPlaceholderProps) => ReactNode`                                                                                                                                                   | -       |
-
-##### `ZeugmaPersistOptions`
-
-```ts
-interface ZeugmaPersistOptions {
-  /** Whether layout persistence is enabled. Defaults to true if this configuration object is provided. */
-  enabled?: boolean
-  /** The key used for localStorage persistence. Defaults to 'zeugma-layout'. */
-  key?: string
-}
-```
 
 ##### `TabDetails`
 
@@ -329,6 +317,7 @@ const { layout, locked, setLocked, addTab, removePane, selectTab, findPaneById }
 | `setLocked`             | Updates the global layout lock state.                                                                                                                                   | `Dispatch<SetStateAction<boolean>>`                                                                                           |
 | `removePane`            | Removes a pane and collapses the split.                                                                                                                                 | `(paneId: string) => void`                                                                                                    |
 | `addTab`                | Adds a tab to a pane, or splits/creates one if target is omitted.                                                                                                       | `(tabId: string, targetPaneId?: string, metadata?: Record<string, unknown>) => void`                                          |
+| `updateTabMetadata`     | Updates a tab's metadata in the fine-grained metadata store without re-rendering the layout tree or unrelated tabs/widgets.                                             | `(tabId: string, updater: MetadataUpdater) => void`                                                                           |
 | `updatePaneLock`        | Toggles the lock status of a specific pane.                                                                                                                             | `(paneId: string, locked: boolean) => void`                                                                                   |
 | `selectTab`             | Focuses/activates a tab within a pane.                                                                                                                                  | `(paneId: string, tabId: string) => void`                                                                                     |
 | `mergeTab`              | Programmatically drags and drops a tab from one pane to another.                                                                                                        | `(draggedTabId: string, targetPaneId: string) => void`                                                                        |
@@ -610,7 +599,7 @@ description: Rules, types, component composition, and programmatic manipulation 
 - **renderPane Placement Rule**: If using `<Zeugma>` with `children` (Context Provider Mode), you MUST pass the `renderPane` prop directly to `<PaneTree renderPane={renderPane} />`, and `renderPane` is forbidden on `<Zeugma>`. If using `<Zeugma>` in standalone mode (without `children`), you MUST pass `renderPane` directly to `<Zeugma renderPane={renderPane} />`.
 - **DragHandle Placement**: Draggable panes require a child `<Pane.DragHandle>` component to define the interactive drag region.
 - **Stable Layout During Drag Rule**: The logical `layout` object from the controller or context does not update in real-time during a drag session. It only updates once the drop action is committed. The active visual removals and split previews are managed by the library's internal rendering layout.
-- **Immutable Tab Metadata**: Tab metadata is decoupled from the layout topology (`TreeNode`). Metadata is registered at tab creation (`initialMetadata`, `addTab(tabId, targetPaneId?, metadata?)`) and read via `findTabById(tabId)?.metadata`, `getTabMetadata(tabId)`, or `useTabMetadata(tabId)`. No imperative `updateMetadata` mutations exist.
+- **Fine-Grained Mutable Tab Metadata**: Tab metadata is decoupled from the layout topology (`TreeNode`) via an external per-tab store (`useSyncExternalStore`). Metadata can be initialized in `initialLayout` or `addTab(tabId, targetPaneId?, metadata?)`, updated without layout/widget re-renders via `updateTabMetadata(tabId, updater)`, and read via `findTabById(tabId)?.metadata`, `getTabMetadata(tabId)`, or `useTabMetadata(tabId)`.
 
 ---
 
@@ -709,9 +698,6 @@ function Dashboard() {
 ### `<Zeugma>` Component Props
 
 - `controller`: The layout state controller returned by `useZeugma(options)`.
-- `persist?: boolean | ZeugmaPersistOptions`: Layout persistence configuration in localStorage.
-  - `enabled?: boolean`: Whether layout persistence is enabled (defaults to true).
-  - `key?: string`: The localStorage key (defaults to `'zeugma-layout'`).
 - `renderPopoutWrapper?: (props: { tabId: string; document: Document; window: Window; children: React.ReactNode }) => React.ReactNode`: [Experimental] Optional custom wrapper to inject style managers or providers into popout windows.
 
 ### `useZeugma(options)`
@@ -721,6 +707,7 @@ Instantiates the dashboard state engine.
 - `initialLayout?: TreeNode | null` (Initial uncontrolled tree)
 - `layout?: TreeNode | null` (Controlled layout tree)
 - `onChange?: (newLayout: TreeNode | null) => void` (Layout updates handler)
+- `onMetadataChange?: (tabId: string, metadata: Record<string, unknown> | undefined) => void` (Metadata updates handler)
 - `locked?: boolean` (Disable all resize/drag-and-drop operations)
 - `fullscreenPaneId?: string | null` (Maximize target pane ID. When active, structural layout changes are blocked)
 - `onFullscreenChange?: (paneId: string | null) => void` (Maximize toggle handler)

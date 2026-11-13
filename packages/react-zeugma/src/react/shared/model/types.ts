@@ -10,7 +10,6 @@ import type {
   ZeugmaClassNames,
   PopoutPlaceholderProps,
   DragOverlayActiveItem,
-  ZeugmaPersistOptions,
 } from '../../../core/types'
 
 export * from '../../../core/types'
@@ -47,6 +46,7 @@ export interface ZeugmaController
 export interface ZeugmaControllerInternal extends ZeugmaController {
   // Transient drag-and-drop/resize state
   _internalSetLayout: Dispatch<SetStateAction<TreeNode | null>>
+  _commitDndLayout: Dispatch<SetStateAction<TreeNode | null>>
   renderingLayout: TreeNode | null
   activeId: string | null
   setActiveId: Dispatch<SetStateAction<string | null>>
@@ -56,6 +56,7 @@ export interface ZeugmaControllerInternal extends ZeugmaController {
   setDismissIntentId: Dispatch<SetStateAction<string | null>>
   containerRef: RefObject<HTMLElement | null>
   setContainerRef: (element: HTMLElement | null) => void
+  subscribeTabMetadata: (tabId: string, listener: () => void) => () => void
 }
 
 export interface BaseZeugmaProps {
@@ -104,8 +105,6 @@ export interface BaseZeugmaProps {
   /** Callback triggered when the drag-out/dismiss intent changes. */
   onDismissIntentChange?: (paneId: string | null) => void
 
-  /** Configuration for layout persistence in localStorage. */
-  persist?: boolean | ZeugmaPersistOptions
   /** [Experimental] Optional custom wrapper element/component to wrap the contents of a popout tab.
    * Useful for styled-components (StyleSheetManager), Antd (ConfigProvider), etc.
    */
@@ -196,6 +195,11 @@ export interface ZeugmaActionsValue extends ZeugmaActions {
   setFullscreenPaneId: (paneId: string | null) => void
   /** Programmatically updates the global locked status. */
   setLocked: Dispatch<SetStateAction<boolean>>
+}
+
+export interface ZeugmaMetadataContextValue {
+  getTabMetadata: (tabId: string) => Record<string, unknown> | undefined
+  subscribeTabMetadata: (tabId: string, listener: () => void) => () => void
 }
 
 export interface PortalRegistryValue {

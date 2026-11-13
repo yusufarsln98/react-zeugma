@@ -15,6 +15,7 @@ export const useZeugmaContext = (): ZeugmaController => {
       setLocked: actions.setLocked,
       removePane: actions.removePane,
       addTab: actions.addTab,
+      updateTabMetadata: actions.updateTabMetadata,
       updatePaneLock: actions.updatePaneLock,
       selectTab: actions.selectTab,
       mergeTab: actions.mergeTab,
