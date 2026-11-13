@@ -196,6 +196,7 @@ describe('Tab Drop Preview rendering', () => {
     findTabById: () => null,
     getTabMetadata: () => undefined,
     getActiveTabMetadata: () => undefined,
+    getMetadataMap: () => ({}),
     renderPane: () => null,
     poppedOutTabIds: [] as string[],
     isTabPoppedOut: () => false,

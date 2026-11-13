@@ -1,5 +1,17 @@
 # react-zeugma
 
+## 8.2.0
+
+### Minor Changes
+
+- **Independent & Consistent Metadata Management**:
+  - Added `initialMetadata`, controlled `metadata`, and `onMetadataMapChange` options to `UseZeugmaOptions` / `useZeugma`, plus `getMetadataMap()` on `ZeugmaQueries` / `useZeugmaController` / `useZeugmaContext` (along with the `TabMetadataMap` type).
+  - Decoupled metadata management into an independent map parallel to the layout tree while keeping strict consistency: removing a tab or pane (`removeTab`, `removePane`, `setLayout`, or controlled `layout` updates) automatically prunes its metadata and notifies `onMetadataChange(tabId, undefined)` and `onMetadataMapChange`.
+  - Guarded `updateTabMetadata` against non-existent tab IDs and prevented orphan metadata entries on initialization or controlled `metadata` updates.
+- **Popout Event Interception & Origin-Safe `popoutUrl`**:
+  - Intercepted `document` and `window` `addEventListener` / `removeEventListener` during active popout interactions so drag/pan interactions (e.g., Leaflet maps) work inside popout windows.
+  - Added `popoutUrl` prop on `<Zeugma>` / `useZeugmaPopouts` / `openPopoutWindow` (defaulting to `'/popout.html'`) so popouts can load from the app's origin and send valid `Referer` headers.
+
 ## 8.1.1
 
 ### Patch Changes

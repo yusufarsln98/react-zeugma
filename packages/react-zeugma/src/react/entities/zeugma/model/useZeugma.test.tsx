@@ -628,4 +628,114 @@ describe('useZeugma Hook', () => {
     const internal = result.current as unknown as ZeugmaControllerInternal
     expect(internal.renderingLayout).toEqual(result.current.layout)
   })
+
+  it('should manage initialMetadata independently of layout and stay consistent on removeTab/removePane', () => {
+    const cleanLayout: TreeNode = {
+      type: 'split',
+      direction: 'row',
+      splitPercentage: 50,
+      first: {
+        type: 'pane',
+        id: 'pane-1',
+        tabIds: ['tab-1', 'tab-2'],
+        activeTabId: 'tab-1',
+      },
+      second: {
+        type: 'pane',
+        id: 'pane-2',
+        tabIds: ['tab-3'],
+        activeTabId: 'tab-3',
+      },
+    }
+    const onMetadataChange = vi.fn()
+    const onMetadataMapChange = vi.fn()
+
+    const { result } = renderHook(() =>
+      useZeugma({
+        initialLayout: cleanLayout,
+        initialMetadata: {
+          'tab-1': { title: 'Tab 1' },
+          'tab-2': { title: 'Tab 2' },
+          'tab-3': { title: 'Tab 3' },
+          'orphan-tab': { title: 'Should Be Ignored' },
+        },
+        onMetadataChange,
+        onMetadataMapChange,
+      }),
+    )
+
+    // Orphan metadata for non-existent tab is not seeded
+    expect(result.current.getTabMetadata('orphan-tab')).toBeUndefined()
+    expect(result.current.getMetadataMap()).toEqual({
+      'tab-1': { title: 'Tab 1' },
+      'tab-2': { title: 'Tab 2' },
+      'tab-3': { title: 'Tab 3' },
+    })
+
+    // Updating metadata does not mutate layout object
+    const layoutBefore = result.current.layout
+    act(() => {
+      result.current.updateTabMetadata('tab-1', { title: 'Tab 1 Updated' })
+    })
+    expect(result.current.layout).toBe(layoutBefore)
+    expect(onMetadataMapChange).toHaveBeenLastCalledWith({
+      'tab-1': { title: 'Tab 1 Updated' },
+      'tab-2': { title: 'Tab 2' },
+      'tab-3': { title: 'Tab 3' },
+    })
+
+    // Updating metadata for a non-existent tab is a no-op
+    act(() => {
+      result.current.updateTabMetadata('ghost-tab', { title: 'Ghost' })
+    })
+    expect(result.current.getTabMetadata('ghost-tab')).toBeUndefined()
+
+    // Removing a pane prunes all its tabs' metadata and notifies listeners
+    act(() => {
+      result.current.removePane('pane-1')
+    })
+    expect(result.current.getTabMetadata('tab-1')).toBeUndefined()
+    expect(result.current.getTabMetadata('tab-2')).toBeUndefined()
+    expect(result.current.getMetadataMap()).toEqual({
+      'tab-3': { title: 'Tab 3' },
+    })
+    expect(onMetadataChange).toHaveBeenCalledWith('tab-1', undefined)
+    expect(onMetadataChange).toHaveBeenCalledWith('tab-2', undefined)
+    expect(onMetadataMapChange).toHaveBeenLastCalledWith({
+      'tab-3': { title: 'Tab 3' },
+    })
+  })
+
+  it('should support controlled metadata synchronized with layout', () => {
+    const cleanLayout: PaneNode = {
+      type: 'pane',
+      id: 'pane-1',
+      tabIds: ['tab-1'],
+      activeTabId: 'tab-1',
+    }
+    const { result, rerender } = renderHook(
+      ({ metadata }: { metadata: Record<string, Record<string, unknown>> }) =>
+        useZeugma({
+          initialLayout: cleanLayout,
+          metadata,
+        }),
+      {
+        initialProps: {
+          metadata: { 'tab-1': { title: 'V1' } } as Record<string, Record<string, unknown>>,
+        },
+      },
+    )
+
+    expect(result.current.getTabMetadata('tab-1')).toEqual({ title: 'V1' })
+
+    rerender({
+      metadata: {
+        'tab-1': { title: 'V2' },
+        'non-existent': { title: 'Ignored' },
+      },
+    })
+
+    expect(result.current.getTabMetadata('tab-1')).toEqual({ title: 'V2' })
+    expect(result.current.getTabMetadata('non-existent')).toBeUndefined()
+  })
 })

@@ -69,6 +69,7 @@ describe('useZeugmaDnd Hook', () => {
       findTabById: vi.fn(),
       getTabMetadata: vi.fn(),
       getActiveTabMetadata: vi.fn(),
+      getMetadataMap: vi.fn(() => ({})),
       poppedOutTabIds: [],
       popoutTab: vi.fn(),
       dockTab: vi.fn(),

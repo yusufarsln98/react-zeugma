@@ -28,6 +28,7 @@ export const useZeugmaContext = (): ZeugmaController => {
       findTabById: state.findTabById,
       getTabMetadata: state.getTabMetadata,
       getActiveTabMetadata: state.getActiveTabMetadata,
+      getMetadataMap: state.getMetadataMap,
       poppedOutTabIds: state.poppedOutTabIds,
       popoutTab: actions.popoutTab,
       dockTab: actions.dockTab,

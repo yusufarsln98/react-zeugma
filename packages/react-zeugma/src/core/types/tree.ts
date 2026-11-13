@@ -38,15 +38,24 @@ export type MetadataUpdater =
   | Record<string, unknown>
   | ((prev: Record<string, unknown> | undefined) => Record<string, unknown> | undefined)
 
+/** Independent per-tab metadata map keyed by tab ID. */
+export type TabMetadataMap = Record<string, Record<string, unknown>>
+
 export interface UseZeugmaOptions {
   /** Initial layout tree model defining pane organization for uncontrolled mode. Only used on initial mount. */
   initialLayout?: TreeNode | null
   /** Controlled layout tree model. If provided, the hook will run in controlled mode and sync with this value. */
   layout?: TreeNode | null
+  /** Initial per-tab metadata map for uncontrolled mode, independent of the layout tree. Takes precedence over `PaneNode.tabsMetadata`. */
+  initialMetadata?: TabMetadataMap
+  /** Controlled per-tab metadata map. When provided, metadata stays synchronized with this map while remaining consistent with the layout tree. */
+  metadata?: TabMetadataMap
   /** Callback triggered when the layout changes via drag-and-drop actions, splits, moves, or resizes. */
   onChange?: (newLayout: TreeNode | null) => void
-  /** Callback triggered when a tab's metadata is updated via `updateTabMetadata`. */
+  /** Callback triggered when a tab's metadata is updated via `updateTabMetadata` or cleared when its pane/tab is removed. */
   onMetadataChange?: (tabId: string, metadata: Record<string, unknown> | undefined) => void
+  /** Callback triggered with the full metadata map whenever metadata is added, updated, or pruned. */
+  onMetadataMapChange?: (metadata: TabMetadataMap) => void
   /** The ID of the pane that is currently taking up the full dashboard area. Null if no pane is fullscreen. */
   fullscreenPaneId?: string | null
   /** Callback triggered when a pane is toggled to/from fullscreen mode. Passes the active fullscreen paneId or null. */
@@ -113,6 +122,8 @@ export interface ZeugmaQueries {
   getTabMetadata: (tabId: string) => Record<string, unknown> | undefined
   /** Get the metadata of the active tab in a specific pane by the pane ID. */
   getActiveTabMetadata: (paneId: string) => Record<string, unknown> | undefined
+  /** Get a snapshot of all live tab metadata keyed by tab ID. */
+  getMetadataMap: () => TabMetadataMap
 }
 
 export interface ZeugmaClassNames {
