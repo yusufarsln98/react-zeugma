@@ -12,6 +12,7 @@ import {
 } from '../../../shared'
 import { createMetadataStore, MetadataStore } from './metadataStore'
 import {
+  createPane,
   removePane,
   addTab,
   splitPane,
@@ -216,19 +217,58 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
     [handleSetLayout],
   )
 
-  // Public setter — resets transient states and metadata when layout is replaced programmatically
+  const notifyMetadataMapDiff = useCallback((prevMap: TabMetadataMap, nextMap: TabMetadataMap) => {
+    const allKeys = new Set([...Object.keys(prevMap), ...Object.keys(nextMap)])
+    let anyChanged = false
+    for (const tabId of allKeys) {
+      if (prevMap[tabId] !== nextMap[tabId]) {
+        anyChanged = true
+        onMetadataChangeRef.current?.(tabId, nextMap[tabId])
+      }
+    }
+    if (anyChanged) {
+      onMetadataMapChangeRef.current?.(nextMap)
+    }
+  }, [])
+
+  const setMetadata = useCallback(
+    (nextMetadataOrUpdater: SetStateAction<TabMetadataMap>) => {
+      const store = metadataStoreRef.current!
+      const prevMap = store.getAll()
+      const nextMap =
+        typeof nextMetadataOrUpdater === 'function'
+          ? (nextMetadataOrUpdater as (prev: TabMetadataMap) => TabMetadataMap)(prevMap)
+          : nextMetadataOrUpdater
+      store.syncFromMap(nextMap, layoutRef.current)
+      notifyMetadataMapDiff(prevMap, store.getAll())
+    },
+    [notifyMetadataMapDiff],
+  )
+
+  // Public setter — resets transient states and prunes metadata for removed tabs
   const setLayout = useCallback(
     (nextLayoutOrUpdater: SetStateAction<TreeNode | null>) => {
-      const resolved =
-        typeof nextLayoutOrUpdater === 'function'
-          ? (nextLayoutOrUpdater as (prev: TreeNode | null) => TreeNode | null)(layoutRef.current)
-          : nextLayoutOrUpdater
-      const removedIds = metadataStoreRef.current!.resetFromTree(resolved)
-      notifyPrunedMetadata(removedIds)
-      _commitDndLayout(resolved)
+      _commitDndLayout(nextLayoutOrUpdater)
     },
-    [_commitDndLayout, notifyPrunedMetadata],
+    [_commitDndLayout],
   )
+
+  // Silent atomic hydration — replaces layout and metadata without firing onChange/onMetadata*Change
+  const hydrate = useCallback((nextLayout: TreeNode | null, nextMetadata?: TabMetadataMap) => {
+    setLocalFullscreenPaneId(null)
+    setActiveId(null)
+    setActiveType(null)
+    setDismissIntentId(null)
+    layoutRef.current = nextLayout
+    setLocalLayout(nextLayout)
+    setRenderingLayout(nextLayout)
+    metadataStoreRef.current!.resetFromTree(nextLayout, nextMetadata)
+    setPoppedOutTabIds((prevPopped) => {
+      if (prevPopped.length === 0) return prevPopped
+      const filtered = prevPopped.filter((id) => findTabById(nextLayout, id) !== null)
+      return filtered.length === prevPopped.length ? prevPopped : filtered
+    })
+  }, [])
 
   // Layout Modification Actions
   const mutateAddTab = useMemo(
@@ -321,6 +361,25 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
         },
         { blockedInFullscreen: true },
       ),
+      splitTab: mutateLayout(
+        (
+          prev,
+          tabId: string,
+          targetPaneId: string,
+          direction: SplitDirection,
+          splitType: 'left' | 'right' | 'top' | 'bottom',
+        ) => {
+          const targetPane =
+            findPaneById(prev, targetPaneId) ?? findPaneContainingTab(prev, targetPaneId)
+          const sourcePane = findPaneContainingTab(prev, tabId)
+          if (!targetPane || !sourcePane) return prev
+          if (sourcePane.id === targetPane.id && sourcePane.tabIds.length <= 1) return prev
+
+          const treeWithoutTab = removeTab(prev, tabId)
+          return splitPane(treeWithoutTab, targetPane.id, direction, splitType, createPane(tabId))
+        },
+        { blockedInFullscreen: true },
+      ),
       updateSplitPercentage: mutateLayout(updateSplitPercentage, { blockedInFullscreen: true }),
       popoutTab: (tabId: string) => {
         if (fullscreenPaneIdRef.current !== null) return
@@ -369,6 +428,8 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
     () => ({
       layout,
       setLayout,
+      setMetadata,
+      hydrate,
       _internalSetLayout,
       _commitDndLayout,
       renderingLayout,
@@ -392,6 +453,8 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
     [
       layout,
       setLayout,
+      setMetadata,
+      hydrate,
       _internalSetLayout,
       _commitDndLayout,
       renderingLayout,

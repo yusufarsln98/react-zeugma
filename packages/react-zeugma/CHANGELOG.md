@@ -1,12 +1,25 @@
 # react-zeugma
 
+## 9.1.0
+
+### Minor Changes
+
+- **Metadata & Layout Hydration Setters**:
+  - Added `setMetadata(metadataOrUpdater)` to `ZeugmaController` / `useZeugma` / `useZeugmaContext()` to replace the metadata map (filtered to tabs present in the current layout) while firing `onMetadataChange` and `onMetadataMapChange`.
+  - Added `hydrate(layout, metadata?)` to `ZeugmaController` / `useZeugma` / `useZeugmaContext()` for atomic, silent loading of `(layout, metadata)` pairs without firing `onChange`, `onMetadataChange`, or `onMetadataMapChange`.
+  - Fixed `setLayout(tree)` so it preserves metadata for surviving tabs and prunes only removed tabs instead of clearing the entire metadata store.
+- **Public `TabMetadataMap` Export on `react-zeugma/react`**:
+  - Re-exported `TabMetadataMap` from `react-zeugma/react` so TypeScript consumers importing from the React subpath can reference it directly.
+- **`splitTab` Action**:
+  - Added `splitTab(tabId, targetPaneId, direction, splitType)` to `ZeugmaActions` / `useZeugma` / `useZeugmaContext()` to move an existing tab into a new split pane in a single atomic operation while preserving its metadata.
+
 ## 9.0.0
 
 ### Major Changes
 
 - **Breaking: Independent & Consistent Metadata Management**:
   - Removed `tabsMetadata` from `PaneNode` (`TreeNode`), `PaneRenderProps`, `TabsProps`, and `usePaneContext()`, as well as pure tree helpers `getTabMetadata(tree, tabId)` and `getActiveTabMetadata(tree, paneId)`.
-  - Replaced embedded pane metadata with an independent `TabMetadataMap` (`Record<string, Record<string, unknown>>`) managed in parallel with the layout tree via `initialMetadata`, controlled `metadata`, `onMetadataMapChange`, and `getMetadataMap()` on `ZeugmaQueries` / `useZeugma` / `useZeugmaContext`.
+  - Replaced embedded pane metadata with an independent `TabMetadataMap` (`Record<string, Record<string, unknown>>`) managed in parallel with the layout tree via `initialMetadata`, controlled `metadata`, `onMetadataMapChange`, `setMetadata(map)`, and `getMetadataMap()` on `ZeugmaQueries` / `useZeugma` / `useZeugmaContext`.
   - Enforced strict consistency with the layout tree: removing a tab or pane (`removeTab`, `removePane`, `setLayout`, or controlled `layout` updates) automatically prunes its metadata and notifies `onMetadataChange(tabId, undefined)` and `onMetadataMapChange`.
   - Guarded `updateTabMetadata` against non-existent tab IDs and prevented orphan metadata entries on initialization or controlled `metadata` updates.
 - **Popout Event Interception & Origin-Safe `popoutUrl`**:

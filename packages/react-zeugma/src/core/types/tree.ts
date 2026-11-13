@@ -96,6 +96,13 @@ export interface ZeugmaActions {
     splitType: 'left' | 'right' | 'top' | 'bottom',
     paneToAdd: string,
   ) => void
+  /** Moves an existing tab from its current pane into a new split pane relative to targetPaneId. */
+  splitTab: (
+    tabId: string,
+    targetPaneId: string,
+    direction: SplitDirection,
+    splitType: 'left' | 'right' | 'top' | 'bottom',
+  ) => void
   /** Updates the split percentage of a split node. */
   updateSplitPercentage: (currentNode: SplitNode, percentage: number) => void
   /** Moves/reorders a tab relative to another target tab. */

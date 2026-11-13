@@ -4,6 +4,7 @@ import type {
   SplitNode,
   SplitDirection,
   TabDetails,
+  TabMetadataMap,
   ZeugmaState,
   ZeugmaActions,
   ZeugmaQueries,
@@ -34,6 +35,10 @@ export interface RenderTabProps extends TabDetails {
 export interface ZeugmaStateSetters {
   /** Updates the layout tree. Also resets transient states like fullscreenPaneId. */
   setLayout: Dispatch<SetStateAction<TreeNode | null>>
+  /** Replaces the entire metadata map (automatically filtered to tabs present in the current layout). */
+  setMetadata: Dispatch<SetStateAction<TabMetadataMap>>
+  /** Silently replaces both the layout tree and metadata map atomically without firing onChange/onMetadataChange/onMetadataMapChange. */
+  hydrate: (layout: TreeNode | null, metadata?: TabMetadataMap) => void
   /** Programmatically sets the fullscreen pane ID. */
   setFullscreenPaneId: (paneId: string | null) => void
   /** Programmatically updates the global locked status. */
@@ -201,6 +206,10 @@ export interface ZeugmaDragStateValue {
  * Consumers of only this context will never re-render from layout/drag state changes.
  */
 export interface ZeugmaActionsValue extends ZeugmaActions {
+  /** Replaces the entire metadata map (automatically filtered to tabs present in the current layout). */
+  setMetadata: Dispatch<SetStateAction<TabMetadataMap>>
+  /** Silently replaces both the layout tree and metadata map atomically without firing onChange/onMetadataChange/onMetadataMapChange. */
+  hydrate: (layout: TreeNode | null, metadata?: TabMetadataMap) => void
   /** Programmatically sets the fullscreen pane ID. */
   setFullscreenPaneId: (paneId: string | null) => void
   /** Programmatically updates the global locked status. */
