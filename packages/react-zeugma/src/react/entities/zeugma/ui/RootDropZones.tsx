@@ -18,7 +18,7 @@ function getActivationStyle(edge: RootSplitEdge, fraction: RootSplitFraction): R
     [edge]: offset,
     left: isHorizontal ? 0 : edge === 'left' ? offset : undefined,
     right: edge === 'right' ? offset : undefined,
-    top: isHorizontal ? offset : '48px',
+    top: edge === 'top' ? offset : isHorizontal ? undefined : '48px',
     width: isHorizontal ? '100%' : '24px',
     height: isHorizontal ? '24px' : 'calc(100% - 96px)',
     zIndex: 100,
