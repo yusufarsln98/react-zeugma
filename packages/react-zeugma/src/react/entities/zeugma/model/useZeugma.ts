@@ -7,7 +7,9 @@ import {
   ZeugmaControllerInternal,
   ZeugmaActions,
   ZeugmaQueries,
+  MetadataUpdater,
 } from '../../../shared'
+import { createMetadataStore, MetadataStore } from './metadataStore'
 import {
   removePane,
   addTab,
@@ -21,8 +23,6 @@ import {
   findPaneById,
   findPaneContainingTab,
   findTabById,
-  getTabMetadata,
-  getActiveTabMetadata,
   areLayoutsEqual,
 } from '../../../../core/tree'
 
@@ -31,6 +31,7 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
     initialLayout,
     layout: controlledLayout,
     onChange,
+    onMetadataChange,
     fullscreenPaneId: controlledFullscreenPaneId,
     onFullscreenChange,
     locked: lockedOption = false,
@@ -45,6 +46,13 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
   const [prevControlledLayout, setPrevControlledLayout] = useState<TreeNode | null | undefined>(
     controlledLayout,
   )
+
+  const metadataStoreRef = useRef<MetadataStore | null>(null)
+  if (!metadataStoreRef.current) {
+    metadataStoreRef.current = createMetadataStore(
+      controlledLayout !== undefined ? controlledLayout : (initialLayout ?? null),
+    )
+  }
   const [fullscreenPaneId, setLocalFullscreenPaneId] = useState<string | null>(
     controlledFullscreenPaneId || null,
   )
@@ -71,6 +79,9 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
 
+  const onMetadataChangeRef = useRef(onMetadataChange)
+  onMetadataChangeRef.current = onMetadataChange
+
   const onFullscreenChangeRef = useRef(onFullscreenChange)
   onFullscreenChangeRef.current = onFullscreenChange
 
@@ -96,6 +107,7 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
       setPrevControlledLayout(controlledLayout)
       setLocalLayout(controlledLayout)
       setRenderingLayout(controlledLayout)
+      metadataStoreRef.current.syncFromTree(controlledLayout)
       setPoppedOutTabIds((prevPopped) => {
         if (prevPopped.length === 0) return prevPopped
         const filtered = prevPopped.filter((id) => findTabById(controlledLayout, id) !== null)
@@ -121,6 +133,7 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
           layoutRef.current = next
           setLocalLayout(next)
           setRenderingLayout(next)
+          metadataStoreRef.current!.pruneMissingTabs(next)
 
           setPoppedOutTabIds((prevPopped) => {
             if (prevPopped.length === 0) return prevPopped
@@ -157,8 +170,8 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
     })
   }, [])
 
-  // Public setter — resets transient states when layout is replaced programmatically
-  const setLayout = useCallback(
+  // Internal commit used by DnD — commits layout without resetting live tab metadata
+  const _commitDndLayout = useCallback(
     (nextLayoutOrUpdater: SetStateAction<TreeNode | null>) => {
       setLocalFullscreenPaneId(null)
       onFullscreenChangeRef.current?.(null)
@@ -176,17 +189,47 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
     [handleSetLayout],
   )
 
+  // Public setter — resets transient states and metadata when layout is replaced programmatically
+  const setLayout = useCallback(
+    (nextLayoutOrUpdater: SetStateAction<TreeNode | null>) => {
+      const resolved =
+        typeof nextLayoutOrUpdater === 'function'
+          ? (nextLayoutOrUpdater as (prev: TreeNode | null) => TreeNode | null)(layoutRef.current)
+          : nextLayoutOrUpdater
+      metadataStoreRef.current!.resetFromTree(resolved)
+      _commitDndLayout(resolved)
+    },
+    [_commitDndLayout],
+  )
+
   // Layout Modification Actions
-  const actions: ZeugmaActions = useMemo(
-    () => ({
-      removePane: mutateLayout(removePane, { blockedInFullscreen: true }),
-      addTab: mutateLayout(
+  const mutateAddTab = useMemo(
+    () =>
+      mutateLayout(
         (prev, tabId: string, targetPaneId?: string, metadata?: Record<string, unknown>) => {
           const cleanedPrev = removeTab(prev, tabId) ?? prev
           return addTab(cleanedPrev, targetPaneId, tabId, metadata)
         },
         { blockedInFullscreen: true },
       ),
+    [mutateLayout],
+  )
+
+  const actions: ZeugmaActions = useMemo(
+    () => ({
+      removePane: mutateLayout(removePane, { blockedInFullscreen: true }),
+      addTab: (tabId: string, targetPaneId?: string, metadata?: Record<string, unknown>) => {
+        if (fullscreenPaneIdRef.current !== null) return
+        if (metadata !== undefined) {
+          metadataStoreRef.current!.set(tabId, metadata)
+        }
+        mutateAddTab(tabId, targetPaneId, metadata)
+      },
+      updateTabMetadata: (tabId: string, updater: MetadataUpdater) => {
+        const store = metadataStoreRef.current!
+        store.update(tabId, updater)
+        onMetadataChangeRef.current?.(tabId, store.get(tabId))
+      },
       updatePaneLock: mutateLayout((prev, paneId: string, isLocked: boolean) => {
         const targetPane = findPaneById(prev, paneId) ?? findPaneContainingTab(prev, paneId)
         if (!targetPane) return prev
@@ -257,7 +300,12 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
         )
       },
     }),
-    [mutateLayout],
+    [mutateLayout, mutateAddTab],
+  )
+
+  const subscribeTabMetadata = useCallback(
+    (tabId: string, listener: () => void) => metadataStoreRef.current!.subscribe(tabId, listener),
+    [],
   )
 
   // Tree queries
@@ -265,9 +313,20 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
     () => ({
       findPaneById: (paneId: string) => findPaneById(layoutRef.current, paneId),
       findPaneContainingTab: (tabId: string) => findPaneContainingTab(layoutRef.current, tabId),
-      findTabById: (tabId: string) => findTabById(layoutRef.current, tabId),
-      getTabMetadata: (tabId: string) => getTabMetadata(layoutRef.current, tabId),
-      getActiveTabMetadata: (paneId: string) => getActiveTabMetadata(layoutRef.current, paneId),
+      findTabById: (tabId: string) => {
+        const tab = findTabById(layoutRef.current, tabId)
+        if (!tab) return null
+        return {
+          ...tab,
+          metadata: metadataStoreRef.current!.get(tabId),
+        }
+      },
+      getTabMetadata: (tabId: string) => metadataStoreRef.current!.get(tabId),
+      getActiveTabMetadata: (paneId: string) => {
+        const pane = findPaneById(layoutRef.current, paneId)
+        if (!pane) return undefined
+        return metadataStoreRef.current!.get(pane.activeTabId)
+      },
     }),
     [],
   )
@@ -277,6 +336,7 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
       layout,
       setLayout,
       _internalSetLayout,
+      _commitDndLayout,
       renderingLayout,
       fullscreenPaneId,
       setFullscreenPaneId,
@@ -291,6 +351,7 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
       setDismissIntentId,
       containerRef,
       setContainerRef,
+      subscribeTabMetadata,
       ...actions,
       ...queries,
     }),
@@ -298,6 +359,7 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
       layout,
       setLayout,
       _internalSetLayout,
+      _commitDndLayout,
       renderingLayout,
       fullscreenPaneId,
       setFullscreenPaneId,
@@ -307,6 +369,7 @@ export function useZeugma(options: UseZeugmaOptions): ZeugmaController {
       activeType,
       dismissIntentId,
       setContainerRef,
+      subscribeTabMetadata,
       actions,
       queries,
     ],

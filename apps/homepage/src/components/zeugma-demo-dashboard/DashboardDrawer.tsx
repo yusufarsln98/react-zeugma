@@ -176,7 +176,7 @@ export function DashboardDrawer({
             <div className="grafana-setting-card">
               <div className="grafana-setting-row">
                 <div>
-                  <div className="grafana-setting-label">Persist Layout (persist)</div>
+                  <div className="grafana-setting-label">Persist Layout (localStorage)</div>
                   <div className="grafana-setting-desc">Save layout changes to localStorage.</div>
                 </div>
                 <label className="grafana-switch">

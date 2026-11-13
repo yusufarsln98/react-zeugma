@@ -34,6 +34,10 @@ export interface TabDetails {
   metadata: Record<string, unknown> | undefined
 }
 
+export type MetadataUpdater =
+  | Record<string, unknown>
+  | ((prev: Record<string, unknown> | undefined) => Record<string, unknown> | undefined)
+
 export interface UseZeugmaOptions {
   /** Initial layout tree model defining pane organization for uncontrolled mode. Only used on initial mount. */
   initialLayout?: TreeNode | null
@@ -41,6 +45,8 @@ export interface UseZeugmaOptions {
   layout?: TreeNode | null
   /** Callback triggered when the layout changes via drag-and-drop actions, splits, moves, or resizes. */
   onChange?: (newLayout: TreeNode | null) => void
+  /** Callback triggered when a tab's metadata is updated via `updateTabMetadata`. */
+  onMetadataChange?: (tabId: string, metadata: Record<string, unknown> | undefined) => void
   /** The ID of the pane that is currently taking up the full dashboard area. Null if no pane is fullscreen. */
   fullscreenPaneId?: string | null
   /** Callback triggered when a pane is toggled to/from fullscreen mode. Passes the active fullscreen paneId or null. */
@@ -65,6 +71,8 @@ export interface ZeugmaActions {
   removePane: (paneId: string) => void
   /** Appends a tab into a target pane node, or splits/creates a new pane if no target pane ID is provided. */
   addTab: (tabId: string, targetPaneId?: string, metadata?: Record<string, unknown>) => void
+  /** Updates the metadata for a specific tab without re-rendering the layout tree or unrelated tabs/widgets. */
+  updateTabMetadata: (tabId: string, updater: MetadataUpdater) => void
   /** Stable callback to update the locked status of a specific pane in the layout tree. */
   updatePaneLock: (paneId: string, locked: boolean) => void
   /** Stable callback to activate a tab within a pane. */
@@ -173,11 +181,4 @@ export interface DragOverlayActiveItem {
   type: 'tab' | 'pane'
   id: string
   isDismissing: boolean
-}
-
-export interface ZeugmaPersistOptions {
-  /** Whether to enable persistence. Defaults to true if the object is provided. */
-  enabled?: boolean
-  /** The key used for localStorage persistence. Defaults to 'zeugma-layout'. */
-  key?: string
 }

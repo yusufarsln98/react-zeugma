@@ -19,7 +19,7 @@ react-zeugma combines the recursive binary splitting model of react-mosaic with 
    - If using `<Zeugma>` in standalone mode (without `children`), pass `renderPane` directly to `<Zeugma renderPane={renderPane} />`.
 4. **DragHandle Placement Rule**: Draggable panes require a child `<Pane.DragHandle>` component to define the interactive drag region.
 5. **Stable Layout During Drag Rule**: The logical `layout` object from the controller or context does not update in real-time during a drag session. It only updates once the drop action is committed. Visual removals and split previews are managed by the library's internal rendering layout.
-6. **Immutable Tab Metadata Rule**: Tab metadata is decoupled from layout topology (`TreeNode`). Metadata is registered at tab creation (`initialMetadata`, `addTab(tabId, targetPaneId?, metadata?)`) and read via `findTabById(tabId)?.metadata`, `getTabMetadata(tabId)`, or `useTabMetadata(tabId)`. No imperative `updateMetadata` mutations exist on the layout controller.
+6. **Fine-Grained Mutable Tab Metadata Rule**: Tab metadata is decoupled from layout topology (`TreeNode`) via an external per-tab store (`useSyncExternalStore`). Metadata can be initialized in `initialLayout` or `addTab(tabId, targetPaneId?, metadata?)`, updated without layout/widget re-renders via `updateTabMetadata(tabId, updater)`, and read via `findTabById(tabId)?.metadata`, `getTabMetadata(tabId)`, or `useTabMetadata(tabId)`.
 
 ## Layout Data Model (JSON Schema)
 The workspace layout is serialized as a recursive binary tree of `TreeNode` elements:
@@ -117,7 +117,7 @@ export default function WorkspaceApp() {
 ## Key APIs & Entrypoints
 
 ### 1. Root Components & Hooks (`react-zeugma`)
-- `<Zeugma controller={controller} renderPane={...} classNames={...} persist={...} />`: Root dashboard layout component.
+- `<Zeugma controller={controller} renderPane={...} classNames={...} />`: Root dashboard layout component.
 - `<PaneTree renderPane={...} />`: Renders split tree when `<Zeugma>` is used as a context provider with children.
 - `<Pane id={id} locked={false}>`: Individual panel wrapper establishing drag-and-drop boundary.
 - `<Pane.DragHandle>`: Draggable region within pane.

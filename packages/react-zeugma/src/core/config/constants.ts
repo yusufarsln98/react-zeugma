@@ -4,7 +4,6 @@ export const DEFAULT_RESIZER_SIZE = 4 // px
 export const DEFAULT_MIN_SPLIT_PERCENTAGE = 5
 export const DEFAULT_MAX_SPLIT_PERCENTAGE = 95
 export const DEFAULT_DISMISS_THRESHOLD = 60 // px
-export const DEFAULT_PERSIST_KEY = 'zeugma-layout'
 export const DEFAULT_TOUCH_ACTIVATION_DELAY = 250 // ms
 export const DEFAULT_TOUCH_ACTIVATION_TOLERANCE = 5 // px
 export const POPOUT_DEFAULT_FALLBACK_BG = '#181b1f'

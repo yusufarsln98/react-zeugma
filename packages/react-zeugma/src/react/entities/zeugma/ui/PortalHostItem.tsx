@@ -98,8 +98,7 @@ export const PortalHostItem: React.FC<PortalHostItemProps> = React.memo(
       prev.tabDetails.id === next.tabDetails.id &&
       prev.tabDetails.paneId === next.tabDetails.paneId &&
       prev.tabDetails.isActive === next.tabDetails.isActive &&
-      prev.tabDetails.index === next.tabDetails.index &&
-      prev.tabDetails.metadata === next.tabDetails.metadata
+      prev.tabDetails.index === next.tabDetails.index
     )
   },
 )

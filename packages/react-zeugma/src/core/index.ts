@@ -49,7 +49,7 @@ export type {
   ZeugmaClassNames,
   PopoutPlaceholderProps,
   DragOverlayActiveItem,
-  ZeugmaPersistOptions,
+  MetadataUpdater,
   DragType,
   SplitPosition,
   TabPosition,

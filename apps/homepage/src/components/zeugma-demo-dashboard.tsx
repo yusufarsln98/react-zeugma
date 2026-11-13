@@ -1,29 +1,34 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { isValidTreeNode } from 'react-zeugma'
 import { Zeugma, Pane, useZeugma, TabDetails, usePaneContext, PaneTree } from 'react-zeugma/react'
 import { DashboardToolbar, DashboardContainer } from './zeugma-demo-dashboard/DashboardLayout'
 import { WidgetWrapper } from './zeugma-demo-dashboard/WidgetWrapper'
 import { LiveDataProvider } from './zeugma-demo-dashboard/LiveDataProvider'
-import { ExternalLink, Maximize2, Minimize2, X } from 'lucide-react'
+import { ExternalLink, Maximize2, Minimize2, Pin, X } from 'lucide-react'
 
 import { WIDGET_META, defaultDashboardLayout } from './zeugma-demo-dashboard/constants'
 
 import { DashboardDrawer } from './zeugma-demo-dashboard/DashboardDrawer'
+import {
+  TabContextMenu,
+  TabContextMenuState,
+  TabStatus,
+} from './zeugma-demo-dashboard/TabContextMenu'
+
+const STATUS_DOT_CLASS: Record<TabStatus, string> = {
+  live: 'bg-emerald-400',
+  alert: 'bg-rose-400',
+  paused: 'bg-amber-400',
+}
 
 // ── Custom Pane Header (Drag Handle, Fullscreen, Close) ──────────────────────
 
 function DashboardPaneHeader() {
-  const {
-    toggleFullscreen,
-    isFullscreen,
-    remove,
-    isActiveTabPoppedOut,
-    popoutTab,
-    dockTab,
-    tabIds = [],
-    activeTabId,
-  } = usePaneContext()
+  const { toggleFullscreen, isFullscreen, remove, tabIds = [], activeTabId } = usePaneContext()
+
+  const [contextMenu, setContextMenu] = useState<TabContextMenuState | null>(null)
 
   const getWidgetTitle = (id: string) => {
     if (id.startsWith('empty-widget')) return 'Empty Panel'
@@ -42,18 +47,41 @@ function DashboardPaneHeader() {
             container: { alignItems: 'stretch' },
             tab: { height: '100%', display: 'flex', alignItems: 'stretch' },
           }}
-          renderTab={({ id, index, isActive, onSelect, isPoppedOut }) => {
+          renderTab={({ id, index, isActive, onSelect, isPoppedOut, metadata }) => {
             const meta = WIDGET_META[id]
             const prevIsActive = index > 0 && tabIds[index - 1] === activeTabId
             const showSplitter = index > 0 && !isActive && !prevIsActive
+            const customTitle = metadata?.title as string | undefined
+            const isPinned = Boolean(metadata?.pinned)
+            const status = metadata?.status as TabStatus | undefined
+
             return (
               <button
                 onClick={onSelect}
+                onContextMenu={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setContextMenu({
+                    tabId: id,
+                    x: e.clientX,
+                    y: e.clientY,
+                    isPoppedOut,
+                  })
+                }}
+                title="Right-click for tab options & metadata"
                 className={`grafana-tab ${isActive ? 'active' : ''} ${isPoppedOut ? 'opacity-50' : ''}`}
               >
                 {showSplitter && <span className="grafana-tab-splitter" />}
+                {isPinned && <Pin className="w-2.5 h-2.5 text-amber-400 shrink-0" />}
                 {meta?.icon}
-                <span className="text-[11px] font-medium tracking-tight">{getWidgetTitle(id)}</span>
+                <span className="text-[11px] font-medium tracking-tight">
+                  {customTitle || getWidgetTitle(id)}
+                </span>
+                {status && STATUS_DOT_CLASS[status] && (
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOT_CLASS[status]}`}
+                  />
+                )}
                 {isPoppedOut && <ExternalLink className="w-2.5 h-2.5 ml-1 opacity-70" />}
               </button>
             )
@@ -65,19 +93,6 @@ function DashboardPaneHeader() {
       </div>
 
       <div className="flex items-center gap-0.5 shrink-0 pl-2 pr-2 border-b border-[var(--demo-line-soft)]">
-        <button
-          onClick={() => {
-            if (isActiveTabPoppedOut) {
-              dockTab()
-            } else {
-              popoutTab()
-            }
-          }}
-          className={`grafana-pane-btn ${isActiveTabPoppedOut ? 'text-blue-400' : ''}`}
-          title={isActiveTabPoppedOut ? 'Dock Panel' : 'Open in New Window'}
-        >
-          <ExternalLink className="w-3 h-3" />
-        </button>
         <button
           onClick={toggleFullscreen}
           className="grafana-pane-btn"
@@ -93,6 +108,12 @@ function DashboardPaneHeader() {
           <X className="w-3 h-3" />
         </button>
       </div>
+
+      <TabContextMenu
+        menu={contextMenu}
+        defaultTitle={contextMenu ? getWidgetTitle(contextMenu.tabId) : ''}
+        onClose={() => setContextMenu(null)}
+      />
     </div>
   )
 }
@@ -135,6 +156,42 @@ function ZeugmaDemoDashboardInner() {
   const [maxSplitPercentage, setMaxSplitPercentage] = useState(95)
 
   const controller = useZeugma({ initialLayout: defaultDashboardLayout })
+  const hasHydratedLayoutRef = useRef(false)
+
+  // Client-side localStorage persistence using the useZeugma controller
+  useEffect(() => {
+    if (!persist) {
+      hasHydratedLayoutRef.current = true
+      return
+    }
+    if (!hasHydratedLayoutRef.current) {
+      hasHydratedLayoutRef.current = true
+      try {
+        const saved = localStorage.getItem('zeugma-layout')
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          if (isValidTreeNode(parsed)) {
+            controller.setLayout(parsed)
+          }
+        }
+      } catch {
+        // Ignore invalid persisted layout
+      }
+    }
+  }, [persist, controller.setLayout])
+
+  useEffect(() => {
+    if (!persist || !hasHydratedLayoutRef.current) return
+    try {
+      if (controller.layout) {
+        localStorage.setItem('zeugma-layout', JSON.stringify(controller.layout))
+      } else {
+        localStorage.removeItem('zeugma-layout')
+      }
+    } catch {
+      // Ignore storage write errors
+    }
+  }, [persist, controller.layout])
 
   // ── Tab / Widget rendering ───────────────────────────────────────────────
 
@@ -193,7 +250,6 @@ function ZeugmaDemoDashboardInner() {
       dragActivationDistance={dragActivationDistance}
       minSplitPercentage={minSplitPercentage}
       maxSplitPercentage={maxSplitPercentage}
-      persist={persist}
       classNames={{
         dropPreview: 'bg-white/5 border border-white/20 transition-all duration-200 shadow-lg',
         rootDropPreview: 'grafana-root-drop-preview',

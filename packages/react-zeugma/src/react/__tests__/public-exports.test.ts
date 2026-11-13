@@ -42,6 +42,7 @@ describe('Public API Runtime Exports Snapshot', () => {
       'usePaneContext',
       'useRenderCounter',
       'useResizer',
+      'useTabMetadata',
       'useZeugma',
       'useZeugmaContext',
     ])

@@ -1,7 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import { renderHook } from '@testing-library/react'
-import { useZeugma, useZeugmaContext, Zeugma, Pane, PaneTree, ZeugmaProps } from '../../../index'
+import {
+  useZeugma,
+  useZeugmaContext,
+  useTabMetadata,
+  Zeugma,
+  Pane,
+  PaneTree,
+  ZeugmaProps,
+} from '../../../index'
 import {
   useZeugmaState,
   useZeugmaActions,
@@ -341,6 +349,7 @@ describe('Tab Drop Preview rendering', () => {
     const mockActions = {
       removePane: vi.fn(),
       addTab: vi.fn(),
+      updateTabMetadata: vi.fn(),
       updatePaneLock: vi.fn(),
       selectTab: vi.fn(),
       mergeTab: vi.fn(),
@@ -398,6 +407,7 @@ describe('Tab Drop Preview rendering', () => {
     const mockActions = {
       removePane: vi.fn(),
       addTab: vi.fn(),
+      updateTabMetadata: vi.fn(),
       updatePaneLock: vi.fn(),
       selectTab: vi.fn(),
       mergeTab: vi.fn(),
@@ -434,68 +444,63 @@ describe('Tab Drop Preview rendering', () => {
     expect(queryByTestId('tab-2')).not.toBeNull()
   })
 
-  describe('Persistence Behavior', () => {
-    beforeEach(() => {
-      localStorage.clear()
-      vi.restoreAllMocks()
-    })
-
-    afterEach(() => {
-      localStorage.clear()
-    })
-
-    it('should save layout to localStorage when layout changes and persist is true', () => {
+  describe('Mutable Tab Metadata & Rerender Isolation', () => {
+    it('should update target tab metadata without rerendering Pane, sibling tabs, or widget body', () => {
       const initialLayout: TreeNode = {
-        type: 'pane',
-        id: 'pane-1',
-        tabIds: ['tab-1'],
-        activeTabId: 'tab-1',
-      }
-
-      let controllerInstance: ZeugmaController | null = null
-
-      const TestWrapper = () => {
-        const controller = useZeugma({ initialLayout })
-        controllerInstance = controller
-        return (
-          <Zeugma
-            controller={controller}
-            persist={true}
-            renderPane={(id) => <Pane id={id}>{id}</Pane>}
-          />
-        )
-      }
-
-      render(<TestWrapper />)
-
-      // Initial save should happen after mount/load phase
-      expect(localStorage.getItem('zeugma-layout')).not.toBeNull()
-      const savedLayout = JSON.parse(localStorage.getItem('zeugma-layout')!)
-      expect(savedLayout).toEqual(initialLayout)
-
-      // Modify layout (e.g. add a tab)
-      act(() => {
-        controllerInstance!.addTab('tab-2', 'pane-1')
-      })
-
-      const updatedSavedLayout = JSON.parse(localStorage.getItem('zeugma-layout')!)
-      expect(updatedSavedLayout.tabIds).toContain('tab-2')
-    })
-
-    it('should load layout from localStorage on mount if persist is true', () => {
-      const savedLayout: TreeNode = {
         type: 'pane',
         id: 'pane-1',
         tabIds: ['tab-1', 'tab-2'],
-        activeTabId: 'tab-2',
-      }
-      localStorage.setItem('zeugma-layout', JSON.stringify(savedLayout))
-
-      const initialLayout: TreeNode = {
-        type: 'pane',
-        id: 'pane-1',
-        tabIds: ['tab-1'],
         activeTabId: 'tab-1',
+        tabsMetadata: {
+          'tab-1': { title: 'Tab 1', badge: 0 },
+          'tab-2': { title: 'Tab 2' },
+        },
+      }
+
+      const renderCounts = {
+        pane: 0,
+        tab1: 0,
+        tab2: 0,
+        widget1: 0,
+        widget1MetaSubscriber: 0,
+      }
+
+      const WidgetBody = ({ id }: { id: string }) => {
+        renderCounts.widget1 += 1
+        return <div data-testid={`widget-${id}`}>Widget {id}</div>
+      }
+
+      const SubscribedBadge = ({ id }: { id: string }) => {
+        const meta = useTabMetadata(id)
+        renderCounts.widget1MetaSubscriber += 1
+        return <span data-testid="subscribed-badge">{String(meta?.badge ?? '')}</span>
+      }
+
+      const PaneBody = ({ id }: { id: string }) => {
+        renderCounts.pane += 1
+        return (
+          <Pane id={id}>
+            <Pane.Tabs
+              renderTab={({ id: tabId, metadata }) => {
+                if (tabId === 'tab-1') renderCounts.tab1 += 1
+                if (tabId === 'tab-2') renderCounts.tab2 += 1
+                return (
+                  <span data-testid={`tab-label-${tabId}`}>
+                    {(metadata?.title as string) || tabId}
+                  </span>
+                )
+              }}
+            />
+            <Pane.Content>
+              {(tab) => (
+                <div>
+                  <WidgetBody id={tab.id} />
+                  <SubscribedBadge id={tab.id} />
+                </div>
+              )}
+            </Pane.Content>
+          </Pane>
+        )
       }
 
       let controllerInstance: ZeugmaController | null = null
@@ -503,69 +508,38 @@ describe('Tab Drop Preview rendering', () => {
       const TestWrapper = () => {
         const controller = useZeugma({ initialLayout })
         controllerInstance = controller
-        return (
-          <Zeugma
-            controller={controller}
-            persist={true}
-            renderPane={(id) => <Pane id={id}>{id}</Pane>}
-          />
-        )
+        return <Zeugma controller={controller} renderPane={(id) => <PaneBody id={id} />} />
       }
 
       render(<TestWrapper />)
 
-      // It should load the layout from localStorage rather than using initialLayout
-      expect(controllerInstance!.layout).toEqual(savedLayout)
-    })
+      expect(screen.getByTestId('tab-label-tab-1').textContent).toBe('Tab 1')
+      expect(screen.getByTestId('tab-label-tab-2').textContent).toBe('Tab 2')
+      expect(screen.getByTestId('subscribed-badge').textContent).toBe('0')
 
-    it('should use custom key if provided in persist object', () => {
-      const customKey = 'my-custom-layout-key'
-      const initialLayout: TreeNode = {
-        type: 'pane',
-        id: 'pane-1',
-        tabIds: ['tab-1'],
-        activeTabId: 'tab-1',
-      }
+      const baseline = { ...renderCounts }
 
-      const TestWrapper = () => {
-        const controller = useZeugma({ initialLayout })
-        return (
-          <Zeugma
-            controller={controller}
-            persist={{ key: customKey }}
-            renderPane={(id) => <Pane id={id}>{id}</Pane>}
-          />
-        )
-      }
+      act(() => {
+        controllerInstance!.updateTabMetadata('tab-1', { title: 'Tab 1 Updated', badge: 5 })
+      })
 
-      render(<TestWrapper />)
+      expect(screen.getByTestId('tab-label-tab-1').textContent).toBe('Tab 1 Updated')
+      expect(screen.getByTestId('subscribed-badge').textContent).toBe('5')
+      expect(controllerInstance!.getTabMetadata('tab-1')).toEqual({
+        title: 'Tab 1 Updated',
+        badge: 5,
+      })
+      expect(controllerInstance!.findTabById('tab-1')?.metadata).toEqual({
+        title: 'Tab 1 Updated',
+        badge: 5,
+      })
 
-      expect(localStorage.getItem(customKey)).not.toBeNull()
-      expect(localStorage.getItem('zeugma-layout')).toBeNull()
-    })
-
-    it('should not persist if enabled is false in persist object', () => {
-      const initialLayout: TreeNode = {
-        type: 'pane',
-        id: 'pane-1',
-        tabIds: ['tab-1'],
-        activeTabId: 'tab-1',
-      }
-
-      const TestWrapper = () => {
-        const controller = useZeugma({ initialLayout })
-        return (
-          <Zeugma
-            controller={controller}
-            persist={{ enabled: false }}
-            renderPane={(id) => <Pane id={id}>{id}</Pane>}
-          />
-        )
-      }
-
-      render(<TestWrapper />)
-
-      expect(localStorage.getItem('zeugma-layout')).toBeNull()
+      // Only tab-1 and the explicit useTabMetadata('tab-1') subscriber rerendered
+      expect(renderCounts.tab1).toBe(baseline.tab1 + 1)
+      expect(renderCounts.widget1MetaSubscriber).toBe(baseline.widget1MetaSubscriber + 1)
+      expect(renderCounts.pane).toBe(baseline.pane)
+      expect(renderCounts.tab2).toBe(baseline.tab2)
+      expect(renderCounts.widget1).toBe(baseline.widget1)
     })
   })
 
