@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
-    "next": "^16.4.2",
+    "next": "^16.4.6",
     "tsup": "^8.5.1"
   },
   "overrides": {
